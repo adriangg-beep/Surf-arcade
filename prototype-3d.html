@@ -1,0 +1,85 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#071d2b">
+<title>SURF ARCADE — prueba 3D</title>
+<style>
+:root{color-scheme:dark;font-family:Inter,system-ui,-apple-system,sans-serif}*{box-sizing:border-box}html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#071d2b;color:#f5fbff}body{overscroll-behavior:none}canvas{position:fixed;inset:0;width:100%;height:100%;display:block}.hud{position:fixed;inset:0;pointer-events:none;display:flex;flex-direction:column;justify-content:space-between;padding:clamp(14px,3vw,34px);background:linear-gradient(180deg,#04182480,transparent 30%,transparent 72%,#04182480)}.top{display:flex;justify-content:space-between;align-items:flex-start;gap:16px}.brand{font-size:11px;letter-spacing:.22em;font-weight:900}.brand span{display:block;color:#8cebe5;font-size:9px;letter-spacing:.3em;margin-top:5px}.status{text-align:right;font-size:10px;letter-spacing:.14em;color:#c6f3f0}.title{position:absolute;left:clamp(16px,4vw,48px);top:45%;transform:translateY(-50%);max-width:300px;text-shadow:0 4px 25px #00203380;transition:opacity .4s}.title small{letter-spacing:.22em;font-size:9px;color:#a3f3eb;font-weight:800}.title h1{font-size:clamp(36px,6vw,76px);line-height:.88;letter-spacing:-.07em;margin:12px 0;font-weight:950}.title p{font-size:12px;line-height:1.55;color:#d6e9ef;max-width:240px}.controls{position:fixed;left:50%;bottom:max(16px,env(safe-area-inset-bottom));transform:translateX(-50%);display:flex;align-items:center;gap:10px;pointer-events:auto}.controls button,.pill{border:1px solid #d7ffff42;background:#061f30a8;color:#f5ffff;backdrop-filter:blur(12px);border-radius:999px;padding:12px 17px;font:800 10px/1 system-ui;letter-spacing:.12em;white-space:nowrap;cursor:pointer}.controls button:active{transform:scale(.97)}.controls button.primary{background:#baf8ee;color:#062334;border-color:#baf8ee}.side-controls{position:fixed;right:clamp(12px,3vw,30px);bottom:30%;display:flex;flex-direction:column;gap:8px;pointer-events:auto}.side-controls button{width:48px;height:48px;border-radius:50%;border:1px solid #e6ffff40;background:#07283b9c;color:white;font-size:20px;backdrop-filter:blur(12px)}.footer{position:fixed;left:clamp(14px,3vw,32px);bottom:clamp(14px,3vw,28px);font-size:9px;letter-spacing:.14em;color:#e0f4f5a6;pointer-events:none}.orientation{display:none;position:fixed;z-index:10;inset:0;background:#071d2b;color:white;align-items:center;justify-content:center;text-align:center;padding:28px}.orientation b{display:block;letter-spacing:.16em}.orientation p{color:#b7d0d9;font-size:13px}.rotate{font-size:38px;margin-bottom:18px}@media(orientation:portrait){.orientation{display:flex}.hud,.controls,.side-controls,.title,.footer{display:none}}@media(max-height:420px){.title{top:42%;left:25px}.title h1{font-size:42px}.title p{font-size:10px}.controls button{padding:10px 13px}.side-controls{bottom:29%}}
+</style>
+</head>
+<body>
+<div id="orientation" class="orientation"><div><div class="rotate">▱ ↻</div><b>GIRA EL MÓVIL</b><p>La prueba 3D se juega en horizontal.</p></div></div>
+<div class="hud"><div class="top"><div class="brand">SURF ARCADE<span>REAL-WAVE RENDER TEST · WEBGL</span></div><div class="status">OLA 01 / 03<br><span id="speed">VELOCIDAD 62%</span></div></div></div>
+<div id="title" class="title"><small>PRUEBA VISUAL 3D</small><h1>RIDE THE<br>BARREL.</h1><p>Una escena nueva: agua con volumen, labio de ola curvado, espuma dinámica y perspectiva 3D.</p></div>
+<div class="side-controls"><button id="up" aria-label="Subir por la ola">↑</button><button id="down" aria-label="Bajar por la ola">↓</button></div>
+<div class="controls"><button id="carve">CARVE</button><button id="air">AÉREO</button><button id="reset" class="primary">REINICIAR ESCENA ↻</button></div>
+<div class="footer">MUEVE ↑ ↓ PARA CAMBIAR DE ALTURA · THREE.JS / WEBGL</div>
+<script type="module">
+import * as THREE from 'https://cdn.jsdelivr.net/npm/three@0.180.0/build/three.module.js';
+
+const scene=new THREE.Scene();
+scene.background=new THREE.Color(0x8bcbdc);
+scene.fog=new THREE.FogExp2(0x8bcbdc,.018);
+const camera=new THREE.PerspectiveCamera(48,innerWidth/innerHeight,.1,180);
+camera.position.set(0,5.7,15.8);camera.lookAt(0,2.5,-1);
+const renderer=new THREE.WebGLRenderer({antialias:true,alpha:false,powerPreference:'high-performance'});
+renderer.setPixelRatio(Math.min(devicePixelRatio,1.65));renderer.setSize(innerWidth,innerHeight);renderer.outputColorSpace=THREE.SRGBColorSpace;renderer.toneMapping=THREE.ACESFilmicToneMapping;renderer.toneMappingExposure=1.18;document.body.prepend(renderer.domElement);
+scene.add(new THREE.HemisphereLight(0xdffaff,0x06364a,2.15));
+const sun=new THREE.DirectionalLight(0xfff2d4,3.3);sun.position.set(-7,12,8);scene.add(sun);
+const fill=new THREE.DirectionalLight(0x49d9ec,1.6);fill.position.set(8,4,-7);scene.add(fill);
+const skyGeo=new THREE.SphereGeometry(120,32,20);
+const skyMat=new THREE.ShaderMaterial({side:THREE.BackSide,depthWrite:false,vertexShader:`varying vec3 vPos;void main(){vPos=position;gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.);}`,fragmentShader:`varying vec3 vPos;void main(){float h=normalize(vPos).y;vec3 a=vec3(.025,.22,.36);vec3 b=vec3(.34,.72,.79);vec3 c=vec3(.88,.88,.77);float t=smoothstep(-.22,.52,h);vec3 col=mix(a,b,t);col=mix(col,c,smoothstep(.25,.85,h)*.32);gl_FragColor=vec4(col,1.);}`});
+scene.add(new THREE.Mesh(skyGeo,skyMat));
+// Distant horizon and soft cloud banks
+const horizon=new THREE.Mesh(new THREE.PlaneGeometry(180,28),new THREE.MeshBasicMaterial({color:0x9bcdd0,transparent:true,opacity:.18,depthWrite:false}));horizon.position.set(0,5,-42);scene.add(horizon);
+function hash(n){return (Math.sin(n*127.1+311.7)*43758.5453)%1}
+const oceanGeo=new THREE.PlaneGeometry(180,110,180,110);oceanGeo.rotateX(-Math.PI/2);
+const oceanMat=new THREE.ShaderMaterial({uniforms:{uTime:{value:0},uDeep:{value:new THREE.Color(0x03425b)},uShallow:{value:new THREE.Color(0x12b7c5)},uLight:{value:new THREE.Color(0xa4fff0)}},vertexShader:`uniform float uTime;varying vec2 vUv;varying vec3 vWorld;void main(){vUv=uv;vec3 p=position;float w=sin(p.x*.22+uTime*1.15)*.16+sin(p.z*.38-uTime*.9)*.09;p.y+=w;vec4 world=modelMatrix*vec4(p,1.);vWorld=world.xyz;gl_Position=projectionMatrix*viewMatrix*world;}`,fragmentShader:`uniform float uTime;uniform vec3 uDeep;uniform vec3 uShallow;uniform vec3 uLight;varying vec2 vUv;varying vec3 vWorld;float noise(vec2 p){return fract(sin(dot(p,vec2(127.1,311.7)))*43758.5453);}void main(){vec2 p=vWorld.xz;float n=noise(floor(p*1.8));float rip=sin(p.x*2.4+sin(p.y*1.7+uTime)*1.8+uTime*1.5)*sin(p.y*3.4-uTime*1.1);float caustic=pow(max(0.,sin(p.x*1.7+sin(p.y*2.+uTime)*.9)*cos(p.y*2.4-uTime)),8.);float fres=clamp(.4+abs(rip)*.22+caustic*.28+n*.12,0.,1.);vec3 col=mix(uDeep,uShallow,fres);col=mix(col,uLight,caustic*.24);gl_FragColor=vec4(col,1.);}`,side:THREE.DoubleSide});
+const ocean=new THREE.Mesh(oceanGeo,oceanMat);ocean.position.set(0,-.1,-25);scene.add(ocean);
+// Main wave: a finely tessellated face whose crest rolls forward into a hollow barrel.
+const NX=150,NV=90,positions=[],uvs=[],indices=[];
+for(let j=0;j<=NV;j++){const v=j/NV;for(let i=0;i<=NX;i++){const u=i/NX;positions.push((u-.5)*22,0,0);uvs.push(u,v);}}
+for(let j=0;j<NV;j++)for(let i=0;i<NX;i++){const a=j*(NX+1)+i,b=a+1,c=a+NX+1,d=c+1;indices.push(a,c,b,b,c,d);}
+const waveGeo=new THREE.BufferGeometry();waveGeo.setAttribute('position',new THREE.Float32BufferAttribute(positions,3));waveGeo.setAttribute('uv',new THREE.Float32BufferAttribute(uvs,2));waveGeo.setIndex(indices);
+const waveMat=new THREE.ShaderMaterial({uniforms:{uTime:{value:0},uFoam:{value:new THREE.Color(0xdffff8)},uDeep:{value:new THREE.Color(0x00506b)},uMid:{value:new THREE.Color(0x06a9bb)},uTop:{value:new THREE.Color(0x86f3e2)}},vertexShader:`uniform float uTime;varying vec2 vUv;varying vec3 vPos;void main(){vUv=uv;float u=uv.x;float v=uv.y;float edge=sin(3.1415926*u);float swell=pow(max(0.,edge),.55);float baseY=.12+v*(4.6+1.0*swell);float curl=pow(smoothstep(.72,1.,v),1.6)*swell;float wobble=sin(u*18.+uTime*1.5)*.045+sin(u*37.-uTime*2.)*.025;float z=-2.3+1.8*curl+0.2*sin(v*5.+uTime)*swell+wobble;float y=baseY-1.0*pow(smoothstep(.92,1.,v),1.3)*swell;vec3 p=vec3((u-.5)*22.,y,z);p.x+=sin(v*3.+uTime*.8)*.16*swell;vPos=p;gl_Position=projectionMatrix*modelViewMatrix*vec4(p,1.);}`,fragmentShader:`uniform float uTime;uniform vec3 uFoam;uniform vec3 uDeep;uniform vec3 uMid;uniform vec3 uTop;varying vec2 vUv;varying vec3 vPos;float hash(vec2 p){return fract(sin(dot(p,vec2(127.1,311.7)))*43758.5453);}void main(){float v=vUv.y;float grain=hash(floor(vPos.xy*32.));float lines=sin(vPos.x*4.0+sin(vPos.y*3.+uTime)*1.4+uTime*1.8)*.5+.5;vec3 col=mix(uDeep,uMid,smoothstep(.02,.7,v));col=mix(col,uTop,smoothstep(.68,1.,v)*.72);col+=vec3(.05,.16,.15)*pow(lines,8.)*.55;float foamNoise=hash(floor(vPos.xy*18.+uTime));float lip=smoothstep(.88,.97,v);float foam=lip*smoothstep(.28,.8,foamNoise+lines*.45);col=mix(col,uFoam,foam*.92);col*=.96+grain*.08;gl_FragColor=vec4(col,1.);}`,side:THREE.DoubleSide,transparent:false});
+const wave=new THREE.Mesh(waveGeo,waveMat);scene.add(wave);
+// Curled lip ribbon and translucent spray veil follow the crest.
+const lipCurve=new THREE.CatmullRomCurve3(Array.from({length:90},(_,i)=>{const u=i/89;const x=(u-.5)*22;const s=Math.sin(Math.PI*u);return new THREE.Vector3(x,4.35+1.15*Math.pow(s,.6),-.4+1.55*Math.pow(s,.6));}));
+const lip=new THREE.Mesh(new THREE.TubeGeometry(lipCurve,220,.105,8,false),new THREE.MeshStandardMaterial({color:0xc9fff1,roughness:.23,metalness:.05,emissive:0x2f8c91,emissiveIntensity:.23}));scene.add(lip);
+const foamMat=new THREE.MeshStandardMaterial({color:0xf0fff9,roughness:.9,transparent:true,opacity:.82});
+const foamGroup=new THREE.Group();scene.add(foamGroup);
+for(let i=0;i<230;i++){const r=.025+Math.random()*.095;const m=new THREE.Mesh(new THREE.IcosahedronGeometry(r,1),foamMat);m.position.set((Math.random()-.5)*22,3.8+Math.random()*1.4,-.2+Math.random()*2);m.userData={phase:Math.random()*6.28,baseY:m.position.y,speed:.3+Math.random()*1.4};foamGroup.add(m)}
+// Board and stylized but dimensional surfer, grouped for carving and aerials.
+const surfer=new THREE.Group();scene.add(surfer);
+const board=new THREE.Mesh(new THREE.CapsuleGeometry(.19,1.65,4,10),new THREE.MeshStandardMaterial({color:0xf3f4df,roughness:.32,metalness:.05}));board.rotation.z=Math.PI/2;board.scale.set(.78,.65,1);board.position.y=.22;surfer.add(board);
+const wetsuit=new THREE.MeshStandardMaterial({color:0x102f45,roughness:.72});
+const skin=new THREE.MeshStandardMaterial({color:0xb97952,roughness:.8});
+const suitBody=new THREE.Mesh(new THREE.CapsuleGeometry(.17,.56,5,8),wetsuit);suitBody.position.set(0,.95,0);suitBody.rotation.z=-.18;surfer.add(suitBody);
+const head=new THREE.Mesh(new THREE.SphereGeometry(.14,14,10),skin);head.position.set(.02,1.42,0);surfer.add(head);
+function limb(a,b,r,mat){const d=new THREE.Vector3().subVectors(b,a);const m=new THREE.Mesh(new THREE.CylinderGeometry(r*.72,r,d.length(),8),mat);m.position.copy(a).add(b).multiplyScalar(.5);m.quaternion.setFromUnitVectors(new THREE.Vector3(0,1,0),d.normalize());surfer.add(m)}
+limb(new THREE.Vector3(0,1.15,0),new THREE.Vector3(-.42,.95,.05),.07,wetsuit);limb(new THREE.Vector3(0,1.15,0),new THREE.Vector3(.4,1.02,-.08),.07,wetsuit);
+limb(new THREE.Vector3(0,.72,0),new THREE.Vector3(-.25,.36,.12),.085,wetsuit);limb(new THREE.Vector3(0,.72,0),new THREE.Vector3(.28,.34,-.12),.085,wetsuit);
+surfer.position.set(-1.2,1.0,1.0);surfer.rotation.y=-.22;
+// A few airborne water droplets in front of the face.
+const drops=new THREE.Group();scene.add(drops);for(let i=0;i<95;i++){const m=new THREE.Mesh(new THREE.SphereGeometry(.025+Math.random()*.045,6,5),new THREE.MeshBasicMaterial({color:0xd4fff7,transparent:true,opacity:.72}));m.userData={phase:Math.random()*6.28,amp:.3+Math.random()*1.5};drops.add(m)}
+let time=0,height=.54,steer=0,airUntil=0;
+function moveHeight(d){height=THREE.MathUtils.clamp(height+d,.12,.92)}
+document.getElementById('up').addEventListener('click',()=>moveHeight(.09));document.getElementById('down').addEventListener('click',()=>moveHeight(-.09));
+document.getElementById('carve').addEventListener('click',()=>{steer=steer===0?1:-steer;surfer.rotation.z=steer*.12;surfer.rotation.y=steer*.35;});
+document.getElementById('air').addEventListener('click',()=>{airUntil=time+1.05;surfer.rotation.z=-.38;});
+document.getElementById('reset').addEventListener('click',()=>{height=.54;steer=0;surfer.rotation.set(0,-.22,0);airUntil=0;});
+const title=document.getElementById('title');
+function animate(){requestAnimationFrame(animate);const dt=Math.min(.04,clock.getDelta());time+=dt;oceanMat.uniforms.uTime.value=time;waveMat.uniforms.uTime.value=time;
+const y=.25+height*3.65;surfer.position.y=y+(time<airUntil?Math.sin((time-(airUntil-1.05))*Math.PI)*1.35:0);surfer.position.x=-1.1+Math.sin(time*.32)*.42+steer*.28;surfer.position.z=.8+Math.sin(time*.8)*.08;
+surfer.rotation.x=Math.sin(time*1.1)*.025;surfer.rotation.z+=(time<airUntil?-.38:steer*.1-surfer.rotation.z)*Math.min(1,dt*4);
+lip.rotation.y=Math.sin(time*.3)*.018;foamGroup.children.forEach((m,i)=>{m.position.x+=Math.sin(time*m.userData.speed+m.userData.phase)*dt*.09;m.position.y=m.userData.baseY+Math.sin(time*1.8+m.userData.phase)*.14;m.scale.setScalar(.75+.25*Math.sin(time*3+m.userData.phase))});
+drops.children.forEach((m,i)=>{const p=m.userData.phase;m.position.set(2.1+Math.sin(time*1.3+p)*m.userData.amp,2.8+Math.abs(Math.sin(time*1.9+p))*2.4,-.2+Math.cos(time+p)*.9)});
+camera.position.x=Math.sin(time*.14)*.28;camera.lookAt(0,2.6,-1.5);document.getElementById('speed').textContent='VELOCIDAD '+Math.round(60+Math.sin(time)*4+Math.abs(steer)*5)+'%';
+renderer.render(scene,camera)}
+const clock=new THREE.Clock();animate();
+addEventListener('resize',()=>{camera.aspect=innerWidth/innerHeight;camera.updateProjectionMatrix();renderer.setPixelRatio(Math.min(devicePixelRatio,1.65));renderer.setSize(innerWidth,innerHeight)});
+</script>
+</body>
+</html>

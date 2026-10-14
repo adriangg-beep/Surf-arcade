@@ -40,7 +40,7 @@ function trick(id){if(mode!=='playing'||fallTimer>0||airTime>0)return;const t=TR
  updateHUD()}
 function loop(now){if(mode!=='playing')return;const dt=Math.min(.032,Math.max(0,(now-lastFrame)/1000));lastFrame=now;elapsed+=dt;waveTime-=dt;wavePhase+=dt*(.7+speed*.9);crestPulse+=dt;update(dt,now);draw();if(waveTime<=0){finishWave();return}requestAnimationFrame(loop)}
 function update(dt,now){
- lane+=(targetLane-lane)*Math.min(1,dt*4.5);depth+=(targetDepth-depth)*Math.min(1,dt*4.2);
+ lane+=(targetLane-lane)*Math.min(1,dt*2.8);depth+=(targetDepth-depth)*Math.min(1,dt*2.5);\n // Wave energy naturally accelerates the board; steering only trims the line.\n const wavePush=(wave>=2?.19:.12)*(0.7+Math.sin(wavePhase*1.1)*.3);\n speed=clamp(speed+wavePush*dt-(Math.abs(targetLane-lane)>.2?dt*.05:0),.32,1.12);\n lane=clamp(lane+Math.sin(wavePhase*.65+depth*2)*dt*.018,.04,.96);\n depth=clamp(depth+Math.sin(wavePhase*.8+lane*3)*dt*.012,.1,.9);
  const movingUp=targetDepth<depth-.015,movingDown=targetDepth>depth+.015;
  if(movingUp){speed=Math.min(1.35,speed+dt*.23);balance=Math.max(25,balance-dt*1.8)}
  else if(movingDown){speed=Math.max(.25,speed-dt*.08);balance=Math.min(100,balance+dt*3.5)}
@@ -54,44 +54,83 @@ function update(dt,now){
 function clamp(v,a,b){return Math.max(a,Math.min(b,v))}
 function pathWaveTop(t){ctx.beginPath();for(let x=0;x<=W+3;x+=4){const u=x/W;const swell=Math.exp(-Math.pow((u-.62)/.34,2));const y=H*(.53-.19*swell)+Math.sin(u*9-t*1.7)*H*.012+Math.sin(u*19+t*1.15)*H*.005;if(x===0)ctx.moveTo(x,y);else ctx.lineTo(x,y)}}
 function draw(){
-  const t=elapsed, pxUnit=Math.max(3,Math.round(W/190));
-  ctx.fillStyle='#f7b65a';ctx.fillRect(0,0,W,H);
-  // Cielo de 8 bits, sol cuadrado y montañas escalonadas.
-  ctx.fillStyle='#f7b65a';ctx.fillRect(0,0,W,H*.43);
-  ctx.fillStyle='#ffdc7b';ctx.fillRect(0,H*.08,W,H*.06);
-  ctx.fillStyle='#ffe8a0';ctx.fillRect(0,H*.16,W,H*.035);
-  const sunX=W*.79,sunY=H*.16,ss=Math.max(8,W*.014);
-  ctx.fillStyle='#fff0a8';ctx.fillRect(sunX-ss*2,sunY-ss*2,ss*4,ss*4);
-  ctx.fillStyle='#fff7cf';ctx.fillRect(sunX-ss,sunY-ss,ss*2,ss*2);
-  ctx.fillStyle='#db795d';ctx.beginPath();ctx.moveTo(0,H*.38);ctx.lineTo(W*.12,H*.28);ctx.lineTo(W*.2,H*.34);ctx.lineTo(W*.31,H*.24);ctx.lineTo(W*.43,H*.37);ctx.lineTo(W*.56,H*.29);ctx.lineTo(W*.7,H*.37);ctx.lineTo(W,H*.3);ctx.lineTo(W,H*.51);ctx.lineTo(0,H*.51);ctx.closePath();ctx.fill();
-  ctx.fillStyle='#a94f58';ctx.beginPath();ctx.moveTo(0,H*.43);ctx.lineTo(W*.16,H*.35);ctx.lineTo(W*.27,H*.42);ctx.lineTo(W*.42,H*.34);ctx.lineTo(W*.58,H*.44);ctx.lineTo(W*.74,H*.36);ctx.lineTo(W,H*.43);ctx.lineTo(W,H*.56);ctx.lineTo(0,H*.56);ctx.closePath();ctx.fill();
-  // Mar en bandas y horizonte pixelado.
-  ctx.fillStyle='#2b8296';ctx.fillRect(0,H*.43,W,H*.57);
-  ctx.fillStyle='#43a9a9';ctx.fillRect(0,H*.46,W,H*.09);
-  ctx.fillStyle='#287b91';ctx.fillRect(0,H*.54,W,H*.46);
-  for(let i=0;i<24;i++){const yy=H*(.47+(i%9)*.045),xx=((i*83-t*(25+i%4)*speed*8)%(W+70)+W+70)%(W+70)-35;ctx.fillStyle=i%3?'#72c6b0':'#c3e6b5';ctx.fillRect(xx,yy,pxUnit*(2+i%4),Math.max(2,pxUnit*.55))}
-  // Cara de la ola: contorno escalonado que avanza hacia el surfista.
-  const points=[];for(let x=0;x<=W+pxUnit;x+=pxUnit*2){const u=x/W;let y=H*(.55-.22*Math.exp(-Math.pow((u-.66)/.32,2)));y+=Math.sin(u*8-t*1.15)*H*.009;points.push([x,Math.round(y/pxUnit)*pxUnit])}
-  ctx.beginPath();ctx.moveTo(0,H);points.forEach(p=>ctx.lineTo(p[0],p[1]));ctx.lineTo(W,H);ctx.closePath();ctx.fillStyle='#116d86';ctx.fill();
-  // Bandas de luz y sombra en bloques para dar volumen retro.
-  ctx.fillStyle='#24a9a5';ctx.beginPath();ctx.moveTo(0,H*.57);ctx.lineTo(W*.15,H*.48);ctx.lineTo(W*.3,H*.42);ctx.lineTo(W*.48,H*.4);ctx.lineTo(W*.61,H*.43);ctx.lineTo(W*.75,H*.5);ctx.lineTo(W*.88,H*.58);ctx.lineTo(W,H*.6);ctx.lineTo(W,H*.72);ctx.lineTo(0,H*.78);ctx.closePath();ctx.fill();
-  ctx.fillStyle='#168b9a';ctx.beginPath();ctx.moveTo(0,H*.66);ctx.lineTo(W*.2,H*.57);ctx.lineTo(W*.4,H*.52);ctx.lineTo(W*.61,H*.54);ctx.lineTo(W*.8,H*.61);ctx.lineTo(W,H*.67);ctx.lineTo(W,H);ctx.lineTo(0,H);ctx.closePath();ctx.fill();
-  ctx.fillStyle='#0c506e';ctx.beginPath();ctx.moveTo(0,H*.79);ctx.lineTo(W*.25,H*.69);ctx.lineTo(W*.48,H*.66);ctx.lineTo(W*.72,H*.7);ctx.lineTo(W,H*.78);ctx.lineTo(W,H);ctx.lineTo(0,H);ctx.closePath();ctx.fill();
-  // Tubo oscuro y labio que rompe por encima del rider.
-  const bx=W*(.68+.018*Math.sin(t*.8)),by=H*(.48+.006*Math.sin(t));
-  ctx.fillStyle='#07344f';ctx.fillRect(bx-W*.13,by-W*.005,W*.24,H*.105);
-  ctx.fillStyle='#092c48';ctx.fillRect(bx-W*.09,by+H*.015,W*.17,H*.055);
-  ctx.fillStyle='#57cdb7';ctx.beginPath();ctx.moveTo(W*.12,H*.55);ctx.lineTo(W*.26,H*.46);ctx.lineTo(W*.4,H*.4);ctx.lineTo(bx-W*.015,H*.39);ctx.lineTo(bx+W*.08,H*.405);ctx.lineTo(bx+W*.105,H*.435);ctx.lineTo(bx+W*.055,H*.425);ctx.lineTo(bx+W*.01,H*.425);ctx.lineTo(W*.54,H*.47);ctx.lineTo(W*.36,H*.53);ctx.closePath();ctx.fill();
-  ctx.fillStyle='#d8f2bc';ctx.fillRect(W*.12,H*.545,W*.14,pxUnit*2);
-  ctx.fillStyle='#f5f3c3';ctx.fillRect(bx-W*.01,H*.39,W*.095,pxUnit*2);
-  // Espuma cuadrada y estelas que corren por la pared.
-  for(let i=0;i<48;i++){const u=(i*37%103)/103,x=W*(.12+u*.75)+Math.sin(t*1.7+i)*pxUnit*2,y=H*(.43+((i*17)%48)/100);ctx.fillStyle=i%4?'#d8f2bc':'#fff6d1';ctx.fillRect(Math.round(x/pxUnit)*pxUnit,Math.round(y/pxUnit)*pxUnit,pxUnit*(1+i%3),pxUnit*(1+i%2))}
-  for(let i=0;i<16;i++){const u=(i*31%97)/97,x=W*u,y=H*(.63+(i%5)*.055)+Math.sin(t*1.5+i)*pxUnit;ctx.fillStyle=i%2?'#5cc4b4':'#d8f2bc';ctx.fillRect(Math.round(x/pxUnit)*pxUnit,Math.round(y/pxUnit)*pxUnit,pxUnit*(3+i%4),Math.max(2,pxUnit*.7))}
-  const riderX=W*(.25+lane*.48),riderY=H*(.39+depth*.42)-(airTime>0?Math.sin((1-airTime/.95)*Math.PI)*H*.11:0)+(fallTimer>0?Math.sin(t*30)*8:0);
-  if(mode==='playing'||mode==='paused'){drawSurfer(riderX,riderY,t);for(const p of particles){ctx.globalAlpha=clamp(p.life/(p.max||1),0,1);ctx.fillStyle=p.color;ctx.fillRect(Math.round(p.x/pxUnit)*pxUnit,Math.round(p.y/pxUnit)*pxUnit,pxUnit,pxUnit)}ctx.globalAlpha=1}
+  const t=elapsed, u=Math.max(1,W/700);
+  // Cinematic ocean: layered gradients, curved water planes, foam and atmospheric spray.
+  const sky=ctx.createLinearGradient(0,0,0,H*.65);
+  sky.addColorStop(0,'#78c9e8');sky.addColorStop(.55,'#c5e9ee');sky.addColorStop(1,'#f8d6a0');
+  ctx.fillStyle=sky;ctx.fillRect(0,0,W,H);
+  const sun=ctx.createRadialGradient(W*.78,H*.16,2,W*.78,H*.16,H*.24);
+  sun.addColorStop(0,'rgba(255,244,194,.95)');sun.addColorStop(1,'rgba(255,244,194,0)');
+  ctx.fillStyle=sun;ctx.fillRect(W*.5,0,W*.5,H*.5);
+  ctx.fillStyle='rgba(255,255,255,.55)';
+  for(let i=0;i<10;i++){let x=((i*173-t*8)%(W+180)+W+180)%(W+180)-90;ctx.beginPath();ctx.ellipse(x,H*(.18+(i%4)*.045),W*(.035+i%3*.012),H*.006,0,0,Math.PI*2);ctx.fill()}
+  // Distant ocean horizon and swell.
+  const horizon=H*.43;
+  ctx.fillStyle='#3d9cae';ctx.fillRect(0,horizon,W,H-horizon);
+  ctx.fillStyle='#277f98';ctx.beginPath();ctx.moveTo(0,horizon+H*.04);
+  for(let x=0;x<=W+4;x+=4){const y=horizon+H*.045+Math.sin(x/W*8+t*.22)*H*.012+Math.sin(x/W*19-t*.3)*H*.004;ctx.lineTo(x,y)}
+  ctx.lineTo(W,H);ctx.lineTo(0,H);ctx.closePath();ctx.fill();
+  // Main face: curved shoulder and a clearly hollow barrel on waves two and three.
+  const tubeActive=wave>=2;
+  const crestX=W*(tubeActive?.68:.82)+Math.sin(t*.3)*W*.012;
+  const crestY=H*(.48+Math.sin(t*.42)*.008);
+  const face=ctx.createLinearGradient(0,H*.38,W,H);
+  face.addColorStop(0,'#b9f5e9');face.addColorStop(.18,'#35c8c2');face.addColorStop(.48,'#078ca8');face.addColorStop(1,'#063d61');
+  ctx.beginPath();ctx.moveTo(0,H);
+  ctx.bezierCurveTo(W*.08,H*.68,W*.12,H*.48,W*.34,H*.47);
+  ctx.bezierCurveTo(W*.48,H*.45,W*.53,H*.33,crestX,H*.37);
+  ctx.bezierCurveTo(W*.78,H*.37,W*.9,H*.5,W,H*.54);
+  ctx.lineTo(W,H);ctx.closePath();ctx.fillStyle=face;ctx.fill();
+  // Broad specular bands follow the flow of the water.
+  for(let i=0;i<8;i++){
+    const yy=H*(.51+i*.055), drift=Math.sin(t*.7+i)*W*.018;
+    ctx.beginPath();ctx.moveTo(-W*.05,yy+H*.03);
+    ctx.bezierCurveTo(W*.18,yy-H*.07+drift,W*.38,yy-H*.09,W*.57,yy+H*.005);
+    ctx.bezierCurveTo(W*.73,yy+H*.07,W*.87,yy+H*.04,W*1.05,yy-H*.015);
+    ctx.lineWidth=Math.max(1,H*.003);ctx.strokeStyle=i%2?'rgba(180,255,239,.18)':'rgba(230,255,248,.22)';ctx.stroke();
+  }
+  // The breaking lip rolls over a dark, open barrel on at least one full wave.
+  if(tubeActive){
+    const tx=crestX, ty=crestY;
+    const tubeGrad=ctx.createRadialGradient(tx-W*.035,ty+H*.085,2,tx-W*.015,ty+H*.075,W*.16);
+    tubeGrad.addColorStop(0,'#031e38');tubeGrad.addColorStop(.52,'#064c69');tubeGrad.addColorStop(1,'#0c8c9c');
+    ctx.beginPath();ctx.moveTo(tx-W*.25,ty+H*.12);
+    ctx.bezierCurveTo(tx-W*.18,ty-H*.045,tx-W*.035,ty-H*.13,tx+W*.075,ty-H*.035);
+    ctx.bezierCurveTo(tx+W*.13,ty+H*.015,tx+W*.075,ty+H*.12,tx+W*.025,ty+H*.145);
+    ctx.bezierCurveTo(tx+W*.005,ty+H*.07,tx+W*.045,ty+H*.025,tx+W*.005,ty-H*.002);
+    ctx.bezierCurveTo(tx-W*.045,ty-H*.045,tx-W*.105,ty+H*.025,tx-W*.15,ty+H*.13);
+    ctx.closePath();ctx.fillStyle=tubeGrad;ctx.fill();
+    // Bright translucent lip and a white, aerated edge.
+    ctx.beginPath();ctx.moveTo(tx-W*.28,ty+H*.13);
+    ctx.bezierCurveTo(tx-W*.19,ty-H*.07,tx-W*.045,ty-H*.16,tx+W*.07,ty-H*.055);
+    ctx.bezierCurveTo(tx+W*.11,ty-H*.005,tx+W*.08,ty+H*.035,tx+W*.035,ty+H*.045);
+    ctx.bezierCurveTo(tx+W*.055,ty-H*.035,tx-W*.015,ty-H*.08,tx-W*.09,ty-H*.005);
+    ctx.bezierCurveTo(tx-W*.17,ty+H*.055,tx-W*.19,ty+H*.14,tx-W*.28,ty+H*.13);
+    ctx.closePath();ctx.fillStyle='#a8fff0';ctx.fill();
+    ctx.strokeStyle='rgba(255,255,255,.95)';ctx.lineWidth=Math.max(2,H*.006);ctx.stroke();
+  } else {
+    ctx.beginPath();ctx.moveTo(W*.12,H*.53);ctx.bezierCurveTo(W*.35,H*.37,W*.56,H*.38,W*.77,H*.47);ctx.strokeStyle='#b9fff0';ctx.lineWidth=H*.025;ctx.stroke();
+  }
+  // Foam sheets and irregular spray, animated along the lip.
+  for(let i=0;i<100;i++){
+    const p=(i*47%101)/101, x=(p*W+Math.sin(t*1.2+i)*W*.008);
+    const y=H*(tubeActive?.43:.46)+Math.sin(p*9+t*.9)*H*.045+(i%5)*H*.004;
+    const r=u*(1+(i%4));
+    ctx.fillStyle=i%4===0?'rgba(255,255,255,.95)':i%3===0?'rgba(224,255,247,.82)':'rgba(163,255,239,.45)';
+    ctx.beginPath();ctx.ellipse(x,y,r*2,r*.6,Math.sin(i+t)*.18,0,Math.PI*2);ctx.fill();
+  }
+  for(let i=0;i<32;i++){
+    const x=((i*67-t*(22+i%5)*speed*8)%(W+50)+W+50)%(W+50)-25;
+    const y=H*(.62+(i%7)*.045)+Math.sin(t*1.3+i)*H*.009;
+    ctx.strokeStyle=i%2?'rgba(202,255,247,.45)':'rgba(255,255,255,.35)';
+    ctx.lineWidth=Math.max(1,u*1.2);ctx.beginPath();ctx.moveTo(x,y);ctx.quadraticCurveTo(x+W*.025,y-H*.008,x+W*.05,y);ctx.stroke();
+  }
+  const riderX=W*(.24+lane*.49), riderY=H*(.43+depth*.38)-(airTime>0?Math.sin((1-airTime/.95)*Math.PI)*H*.11:0)+(fallTimer>0?Math.sin(t*30)*8:0);
+  if(mode==='playing'||mode==='paused'){drawSurfer(riderX,riderY,t);for(const p of particles){ctx.globalAlpha=clamp(p.life/(p.max||1),0,1);ctx.fillStyle=p.color;ctx.beginPath();ctx.arc(p.x,p.y,Math.max(1,p.size),0,Math.PI*2);ctx.fill()}ctx.globalAlpha=1}
   else drawSurfer(W*.51,H*.69+Math.sin(t*2)*3,t);
-  // Pixel-grid overlay is intentionally subtle.
-  ctx.fillStyle='#062b3b18';for(let y=0;y<H;y+=pxUnit*3)ctx.fillRect(0,y,W,1);
+  // Atmospheric mist around the breaking section.
+  const mist=ctx.createLinearGradient(0,H*.4,0,H*.57);mist.addColorStop(0,'rgba(255,255,255,.20)');mist.addColorStop(1,'rgba(255,255,255,0)');
+  ctx.fillStyle=mist;ctx.fillRect(0,H*.39,W,H*.19);
 }
 function drawSurfer(x,y,t){
   ctx.save();const unit=Math.max(3,Math.round(W/190));ctx.translate(Math.round(x/unit)*unit,Math.round(y/unit)*unit);

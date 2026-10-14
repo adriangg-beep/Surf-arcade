@@ -133,20 +133,39 @@ function draw(){
   ctx.fillStyle=mist;ctx.fillRect(0,H*.39,W,H*.19);
 }
 function drawSurfer(x,y,t){
-  ctx.save();const unit=Math.max(3,Math.round(W/190));ctx.translate(Math.round(x/unit)*unit,Math.round(y/unit)*unit);
-  const lean=clamp((targetLane-lane)*1.5,-.35,.35)+(airTime>0?Math.sin(t*11)*.18:0);ctx.rotate(lean);
-  const s=unit;
-  // Spray trail, board and small readable pixel surfer sprite.
-  ctx.fillStyle='#b8e7b5';ctx.fillRect(-s*10,s*3,s*5,s);ctx.fillRect(-s*7,s*5,s*3,s);ctx.fillRect(-s*13,s*1,s*3,s);
-  ctx.fillStyle='#f5e7a2';ctx.fillRect(-s*12,s*2,s*23,s*2);ctx.fillRect(-s*10,s*1,s*18,s);ctx.fillStyle='#a94f58';ctx.fillRect(-s*7,s*2,s*9,Math.max(2,s*.5));
-  // Legs / wetsuit
-  ctx.fillStyle='#12384c';ctx.fillRect(-s*2,-s*2,s*2,s*4);ctx.fillRect(s*1,-s*1,s*2,s*3);ctx.fillRect(-s*5,s*1,s*4,s);ctx.fillRect(s*2,s*1,s*4,s);
-  // Torso and arms, with pose change during aerial.
-  ctx.fillStyle='#db795d';ctx.fillRect(-s*2,-s*8,s*5,s*6);
-  ctx.fillStyle='#12384c';ctx.fillRect(-s*5,-s*7,s*3,s*2);ctx.fillRect(s*3,-s*7,s*4,s*2);ctx.fillRect(-s*7,-s*6,s*2,s*2);ctx.fillRect(s*7,-s*6,s*2,s*2);
-  if(airTime>0){ctx.fillStyle='#fff6d1';ctx.fillRect(-s*12,-s*13,s*2,s);ctx.fillRect(-s*9,-s*15,s*2,s);ctx.fillRect(-s*6,-s*16,s*2,s)}
-  // Head and hair
-  ctx.fillStyle='#f0c18a';ctx.fillRect(-s,-s*11,s*4,s*3);ctx.fillStyle='#12384c';ctx.fillRect(-s*2,-s*12,s*5,s*2);ctx.fillRect(-s*2,-s*10,s,s);
+  ctx.save();ctx.translate(x,y);
+  const scale=Math.max(.72,Math.min(1.35,W/850));
+  const lean=clamp((targetLane-lane)*1.5,-.28,.28)+(airTime>0?Math.sin(t*11)*.12:0);
+  ctx.rotate(lean);ctx.scale(scale,scale);
+  // Board with curved rails, shadow, deck and fin.
+  ctx.save();ctx.translate(0,13);
+  ctx.beginPath();ctx.moveTo(-48,2);ctx.quadraticCurveTo(-36,-5,2,-4);ctx.quadraticCurveTo(28,-4,47,0);ctx.quadraticCurveTo(27,7,-8,7);ctx.quadraticCurveTo(-38,7,-48,2);ctx.closePath();
+  ctx.fillStyle='rgba(1,29,48,.32)';ctx.fill();
+  ctx.beginPath();ctx.moveTo(-50,0);ctx.quadraticCurveTo(-39,-7,0,-6);ctx.quadraticCurveTo(30,-5,48,0);ctx.quadraticCurveTo(28,6,-8,6);ctx.quadraticCurveTo(-38,6,-50,0);ctx.closePath();
+  const board=ctx.createLinearGradient(0,-7,0,7);board.addColorStop(0,'#fff5d5');board.addColorStop(.5,'#f7d78d');board.addColorStop(1,'#db855c');ctx.fillStyle=board;ctx.fill();
+  ctx.strokeStyle='rgba(255,255,255,.9)';ctx.lineWidth=1.5;ctx.stroke();
+  ctx.beginPath();ctx.moveTo(-23,0);ctx.lineTo(28,0);ctx.strokeStyle='#e16e61';ctx.lineWidth=2;ctx.stroke();
+  ctx.beginPath();ctx.moveTo(27,3);ctx.lineTo(31,10);ctx.lineTo(36,4);ctx.closePath();ctx.fillStyle='#183d51';ctx.fill();
+  ctx.restore();
+  // Knees bent, feet planted on the deck; torso leans into the wave.
+  ctx.strokeStyle='#163b50';ctx.lineWidth=7;ctx.lineCap='round';ctx.lineJoin='round';
+  ctx.beginPath();ctx.moveTo(-4,-9);ctx.lineTo(-17,-1);ctx.lineTo(-27,5);ctx.moveTo(5,-8);ctx.lineTo(17,-1);ctx.lineTo(24,4);ctx.stroke();
+  ctx.fillStyle='#183c51';ctx.beginPath();ctx.ellipse(-27,5,7,3,.12,0,Math.PI*2);ctx.ellipse(24,4,7,3,-.12,0,Math.PI*2);ctx.fill();
+  // Wetsuit / rash guard with curved silhouette.
+  ctx.beginPath();ctx.moveTo(-8,-39);ctx.quadraticCurveTo(-17,-33,-13,-19);ctx.lineTo(-7,-9);ctx.lineTo(9,-9);ctx.lineTo(14,-22);ctx.quadraticCurveTo(17,-34,7,-39);ctx.closePath();
+  const shirt=ctx.createLinearGradient(-10,-38,12,-10);shirt.addColorStop(0,'#ff9b72');shirt.addColorStop(1,'#d84e57');ctx.fillStyle=shirt;ctx.fill();
+  // Arms counterbalance the board; pose opens slightly during an aerial.
+  ctx.strokeStyle='#dca77d';ctx.lineWidth=5.5;
+  ctx.beginPath();ctx.moveTo(-10,-34);ctx.quadraticCurveTo(-23,-32,-30,-23);ctx.moveTo(10,-34);ctx.quadraticCurveTo(22,-36,30,-27);ctx.stroke();
+  ctx.strokeStyle='#173c50';ctx.lineWidth=5;
+  ctx.beginPath();ctx.moveTo(-30,-23);ctx.lineTo(-37,-21);ctx.moveTo(30,-27);ctx.lineTo(36,-23);ctx.stroke();
+  if(airTime>0){ctx.strokeStyle='#e4b68b';ctx.lineWidth=5;ctx.beginPath();ctx.moveTo(-10,-34);ctx.lineTo(-23,-48);ctx.moveTo(10,-34);ctx.lineTo(24,-49);ctx.stroke()}
+  // Head, neck and sunlit hair.
+  ctx.fillStyle='#dca77d';ctx.fillRect(-3,-44,6,7);
+  ctx.beginPath();ctx.ellipse(0,-49,7.3,8.5,-.12,0,Math.PI*2);ctx.fillStyle='#dca77d';ctx.fill();
+  ctx.beginPath();ctx.moveTo(-7,-49);ctx.quadraticCurveTo(-8,-60,2,-59);ctx.quadraticCurveTo(9,-58,8,-49);ctx.lineTo(3,-52);ctx.lineTo(-2,-52);ctx.closePath();ctx.fillStyle='#5a392f';ctx.fill();
+  // Fine wake beneath the rail reinforces constant forward motion.
+  ctx.strokeStyle='rgba(225,255,247,.85)';ctx.lineWidth=1.5;ctx.beginPath();ctx.moveTo(-63,17);ctx.quadraticCurveTo(-34,12,-10,16);ctx.stroke();
   ctx.restore();
 }
 function finishWave(){mode='result';playingUI(false);total+=score;waveStats.score=score;waveStats.maxCombo=maxCombo;waveStats.falls=falls;session.push({...waveStats,tricks:waveStats.tricks.size});$('result-eyebrow').textContent='OLA '+wave+' COMPLETADA';$('result-title').innerHTML=wave===3?'ÚLTIMA<br><em>OLA.</em>':'BUENA<br><em>SESIÓN.</em>';$('result-score').textContent=score.toLocaleString('es-ES');$('result-tricks').textContent=landed;$('result-combo').textContent='×'+(maxCombo?Math.min(CFG.maxCombo,1+(maxCombo-1)*.4).toFixed(1):'1.0');$('result-falls').textContent=falls;$('next-wave-btn').innerHTML=wave===3?'VER RESULTADO FINAL <span>↗</span>':'SIGUIENTE OLA <span>↗</span>';show('wave-result');tone(620,.2,'triangle',.04)}

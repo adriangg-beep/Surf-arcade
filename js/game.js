@@ -40,7 +40,12 @@ function trick(id){if(mode!=='playing'||fallTimer>0||airTime>0)return;const t=TR
  updateHUD()}
 function loop(now){if(mode!=='playing')return;const dt=Math.min(.032,Math.max(0,(now-lastFrame)/1000));lastFrame=now;elapsed+=dt;waveTime-=dt;wavePhase+=dt*(.7+speed*.9);crestPulse+=dt;update(dt,now);draw();if(waveTime<=0){finishWave();return}requestAnimationFrame(loop)}
 function update(dt,now){
- lane+=(targetLane-lane)*Math.min(1,dt*2.8);depth+=(targetDepth-depth)*Math.min(1,dt*2.5);\n // Wave energy naturally accelerates the board; steering only trims the line.\n const wavePush=(wave>=2?.19:.12)*(0.7+Math.sin(wavePhase*1.1)*.3);\n speed=clamp(speed+wavePush*dt-(Math.abs(targetLane-lane)>.2?dt*.05:0),.32,1.12);\n lane=clamp(lane+Math.sin(wavePhase*.65+depth*2)*dt*.018,.04,.96);\n depth=clamp(depth+Math.sin(wavePhase*.8+lane*3)*dt*.012,.1,.9);
+ lane+=(targetLane-lane)*Math.min(1,dt*2.8);depth+=(targetDepth-depth)*Math.min(1,dt*2.5);
+ // Wave energy naturally accelerates the board; steering only trims the line.
+ const wavePush=(wave >= 2 ? 0.19 : 0.12)*(0.7+Math.sin(wavePhase*1.1)*.3);
+ speed=clamp(speed+wavePush*dt-(Math.abs(targetLane-lane)>.2?dt*.05:0),.32,1.12);
+ lane=clamp(lane+Math.sin(wavePhase*.65+depth*2)*dt*.018,.04,.96);
+ depth=clamp(depth+Math.sin(wavePhase*.8+lane*3)*dt*.012,.1,.9);
  const movingUp=targetDepth<depth-.015,movingDown=targetDepth>depth+.015;
  if(movingUp){speed=Math.min(1.35,speed+dt*.23);balance=Math.max(25,balance-dt*1.8)}
  else if(movingDown){speed=Math.max(.25,speed-dt*.08);balance=Math.min(100,balance+dt*3.5)}

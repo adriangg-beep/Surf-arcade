@@ -3,83 +3,96 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,viewport-fit=cover">
-<meta name="theme-color" content="#071d2b">
-<title>SURF ARCADE — prueba 3D</title>
+<meta name="theme-color" content="#092d43">
+<title>SURF ARCADE — Pixel Barrel</title>
 <style>
-:root{color-scheme:dark;font-family:Inter,system-ui,-apple-system,sans-serif}*{box-sizing:border-box}html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#071d2b;color:#f5fbff}body{overscroll-behavior:none}canvas{position:fixed;inset:0;width:100%;height:100%;display:block}.hud{position:fixed;inset:0;pointer-events:none;display:flex;flex-direction:column;justify-content:space-between;padding:clamp(14px,3vw,34px);background:linear-gradient(180deg,#04182480,transparent 30%,transparent 72%,#04182480)}.top{display:flex;justify-content:space-between;align-items:flex-start;gap:16px}.brand{font-size:11px;letter-spacing:.22em;font-weight:900}.brand span{display:block;color:#8cebe5;font-size:8px;letter-spacing:.22em;margin-top:5px}.status{text-align:right;font-size:10px;letter-spacing:.14em;color:#c6f3f0}.title{position:absolute;left:clamp(16px,4vw,48px);top:51%;transform:translateY(-50%);max-width:300px;text-shadow:0 4px 25px #00203380;transition:opacity .4s}.title small{letter-spacing:.22em;font-size:9px;color:#a3f3eb;font-weight:800;display:inline-block;background:#063247a6;padding:6px 8px;border-radius:3px;margin-bottom:4px}.title h1{font-size:clamp(36px,6vw,76px);line-height:.88;letter-spacing:-.07em;margin:12px 0;font-weight:950}.title p{font-size:12px;line-height:1.55;color:#d6e9ef;max-width:240px}.controls{position:fixed;left:50%;bottom:max(16px,env(safe-area-inset-bottom));transform:translateX(-50%);display:flex;align-items:center;gap:10px;pointer-events:auto}.controls button,.pill{border:1px solid #d7ffff42;background:#061f30a8;color:#f5ffff;backdrop-filter:blur(12px);border-radius:999px;padding:12px 17px;font:800 10px/1 system-ui;letter-spacing:.12em;white-space:nowrap;cursor:pointer}.controls button:active{transform:scale(.97)}.controls button.primary{background:#baf8ee;color:#062334;border-color:#baf8ee}.side-controls{position:fixed;right:clamp(12px,3vw,30px);bottom:30%;display:flex;flex-direction:column;gap:8px;pointer-events:auto}.side-controls button{width:48px;height:48px;border-radius:50%;border:1px solid #e6ffff40;background:#07283b9c;color:white;font-size:20px;backdrop-filter:blur(12px)}.footer{position:fixed;left:clamp(14px,3vw,32px);bottom:clamp(14px,3vw,28px);font-size:9px;letter-spacing:.14em;color:#e0f4f5a6;pointer-events:none}.orientation{display:none;position:fixed;z-index:10;inset:0;background:#071d2b;color:white;align-items:center;justify-content:center;text-align:center;padding:28px}.orientation b{display:block;letter-spacing:.16em}.orientation p{color:#b7d0d9;font-size:13px}.rotate{font-size:38px;margin-bottom:18px}@media(orientation:portrait){.orientation{display:flex}.hud,.controls,.side-controls,.title,.footer{display:none}}@media(max-height:420px){.title{top:42%;left:25px}.title h1{font-size:42px}.title p{font-size:10px}.controls button{padding:10px 13px}.side-controls{bottom:29%}}
+*{box-sizing:border-box}html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#08263b;color:#fff;font-family:system-ui,-apple-system,sans-serif;overscroll-behavior:none}canvas{display:block;width:100%;height:100%;image-rendering:pixelated;touch-action:none}.hud{position:fixed;inset:0;pointer-events:none;display:flex;flex-direction:column;justify-content:space-between;padding:max(12px,env(safe-area-inset-top)) max(14px,env(safe-area-inset-right)) max(12px,env(safe-area-inset-bottom)) max(14px,env(safe-area-inset-left));text-shadow:2px 2px #102f48}.top{display:flex;justify-content:space-between;align-items:flex-start;font-weight:900;letter-spacing:.12em;font-size:clamp(10px,1.5vw,14px)}.sub{display:block;color:#b5f5e9;font-size:9px;letter-spacing:.18em;margin-top:4px}.score{text-align:right;font-variant-numeric:tabular-nums}.bottom{display:flex;justify-content:space-between;align-items:end;gap:10px;font-size:9px;letter-spacing:.12em;color:#e0ffff}.controls{position:fixed;bottom:max(16px,env(safe-area-inset-bottom));left:50%;transform:translateX(-50%);display:flex;gap:8px;pointer-events:auto}.controls button{font:900 11px system-ui;letter-spacing:.08em;color:#fff;background:#082d43e8;border:2px solid #b5f5e9;border-radius:3px;padding:12px 15px;min-width:70px;box-shadow:3px 3px 0 #061c2b;touch-action:manipulation}.controls button:active{transform:translate(2px,2px);box-shadow:1px 1px 0 #061c2b}.controls .primary{background:#f4d35e;color:#16354a;border-color:#fff1a8}.move{position:fixed;right:max(12px,env(safe-area-inset-right));bottom:82px;display:flex;flex-direction:column;gap:8px;pointer-events:auto}.move button{width:48px;height:48px;font-size:22px;font-weight:900;color:white;background:#082d43e8;border:2px solid #b5f5e9;border-radius:3px;touch-action:manipulation}.banner{position:fixed;left:50%;top:50%;transform:translate(-50%,-50%);text-align:center;pointer-events:none;text-shadow:3px 3px #17334a;transition:opacity .2s}.banner h1{font-size:clamp(26px,5vw,54px);line-height:.9;letter-spacing:-.04em;margin:0;color:#ffe66d}.banner p{font-size:11px;font-weight:800;letter-spacing:.12em}.rotate{display:none;position:fixed;inset:0;background:#092d43;z-index:5;align-items:center;justify-content:center;text-align:center;padding:25px}.rotate strong{display:block;font-size:18px}.rotate span{font-size:36px;display:block;margin-bottom:12px}@media(orientation:portrait){.rotate{display:flex}.hud,.controls,.move,.banner{display:none}}@media(max-height:400px){.controls{bottom:8px}.controls button{padding:8px 10px;min-width:60px}.move{bottom:58px}.move button{width:40px;height:40px}.bottom{font-size:8px}}
 </style>
 </head>
 <body>
-<div id="orientation" class="orientation"><div><div class="rotate">▱ ↻</div><b>GIRA EL MÓVIL</b><p>La prueba 3D se juega en horizontal.</p></div></div>
-<div class="hud"><div class="top"><div class="brand">SURF ARCADE<span>REAL-WAVE RENDER TEST · WEBGL</span></div><div class="status">OLA 01 / 03<br><span id="speed">VELOCIDAD 62%</span></div></div></div>
-<div id="title" class="title"><small>PRUEBA VISUAL 3D</small><h1>RIDE THE<br>BARREL.</h1><p>Una escena nueva: agua con volumen, labio de ola curvado, espuma dinámica y perspectiva 3D.</p></div>
-<div class="side-controls"><button id="up" aria-label="Subir por la ola">↑</button><button id="down" aria-label="Bajar por la ola">↓</button></div>
-<div class="controls"><button id="carve">CARVE</button><button id="air">AÉREO</button><button id="reset" class="primary">REINICIAR ESCENA ↻</button></div>
-<div class="footer">MUEVE ↑ ↓ PARA CAMBIAR DE ALTURA · THREE.JS / WEBGL</div>
-<script type="module">
-import * as THREE from 'https://cdn.jsdelivr.net/npm/three@0.180.0/build/three.module.js';
-
-const scene=new THREE.Scene();
-scene.background=new THREE.Color(0x8bcbdc);
-scene.fog=new THREE.FogExp2(0x8bcbdc,.018);
-const camera=new THREE.PerspectiveCamera(48,innerWidth/innerHeight,.1,180);
-camera.position.set(0,5.7,15.8);camera.lookAt(0,2.5,-1);
-const renderer=new THREE.WebGLRenderer({antialias:true,alpha:false,powerPreference:'high-performance'});
-renderer.setPixelRatio(Math.min(devicePixelRatio,1.65));renderer.setSize(innerWidth,innerHeight);renderer.outputColorSpace=THREE.SRGBColorSpace;renderer.toneMapping=THREE.ACESFilmicToneMapping;renderer.toneMappingExposure=1.18;document.body.prepend(renderer.domElement);
-scene.add(new THREE.HemisphereLight(0xdffaff,0x06364a,2.15));
-const sun=new THREE.DirectionalLight(0xfff2d4,3.3);sun.position.set(-7,12,8);scene.add(sun);
-const fill=new THREE.DirectionalLight(0x49d9ec,1.6);fill.position.set(8,4,-7);scene.add(fill);
-const skyGeo=new THREE.SphereGeometry(120,32,20);
-const skyMat=new THREE.ShaderMaterial({side:THREE.BackSide,depthWrite:false,vertexShader:`varying vec3 vPos;void main(){vPos=position;gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.);}`,fragmentShader:`varying vec3 vPos;void main(){float h=normalize(vPos).y;vec3 a=vec3(.025,.22,.36);vec3 b=vec3(.34,.72,.79);vec3 c=vec3(.88,.88,.77);float t=smoothstep(-.22,.52,h);vec3 col=mix(a,b,t);col=mix(col,c,smoothstep(.25,.85,h)*.32);gl_FragColor=vec4(col,1.);}`});
-scene.add(new THREE.Mesh(skyGeo,skyMat));
-// Distant horizon and soft cloud banks
-const horizon=new THREE.Mesh(new THREE.PlaneGeometry(180,28),new THREE.MeshBasicMaterial({color:0x9bcdd0,transparent:true,opacity:.18,depthWrite:false}));horizon.position.set(0,5,-42);scene.add(horizon);
-function hash(n){return (Math.sin(n*127.1+311.7)*43758.5453)%1}
-const oceanGeo=new THREE.PlaneGeometry(180,110,180,110);oceanGeo.rotateX(-Math.PI/2);
-const oceanMat=new THREE.ShaderMaterial({uniforms:{uTime:{value:0},uDeep:{value:new THREE.Color(0x03425b)},uShallow:{value:new THREE.Color(0x12b7c5)},uLight:{value:new THREE.Color(0xa4fff0)}},vertexShader:`uniform float uTime;varying vec2 vUv;varying vec3 vWorld;void main(){vUv=uv;vec3 p=position;float w=sin(p.x*.22+uTime*1.15)*.16+sin(p.z*.38-uTime*.9)*.09;p.y+=w;vec4 world=modelMatrix*vec4(p,1.);vWorld=world.xyz;gl_Position=projectionMatrix*viewMatrix*world;}`,fragmentShader:`uniform float uTime;uniform vec3 uDeep;uniform vec3 uShallow;uniform vec3 uLight;varying vec2 vUv;varying vec3 vWorld;float noise(vec2 p){return fract(sin(dot(p,vec2(127.1,311.7)))*43758.5453);}void main(){vec2 p=vWorld.xz;float n=noise(floor(p*1.8));float rip=sin(p.x*2.4+sin(p.y*1.7+uTime)*1.8+uTime*1.5)*sin(p.y*3.4-uTime*1.1);float caustic=pow(max(0.,sin(p.x*1.7+sin(p.y*2.+uTime)*.9)*cos(p.y*2.4-uTime)),8.);float fres=clamp(.4+abs(rip)*.22+caustic*.28+n*.12,0.,1.);vec3 col=mix(uDeep,uShallow,fres);col=mix(col,uLight,caustic*.24);gl_FragColor=vec4(col,1.);}`,side:THREE.DoubleSide});
-const ocean=new THREE.Mesh(oceanGeo,oceanMat);ocean.position.set(0,-.1,-25);scene.add(ocean);
-// Main wave: a finely tessellated face whose crest rolls forward into a hollow barrel.
-const NX=150,NV=90,positions=[],uvs=[],indices=[];
-for(let j=0;j<=NV;j++){const v=j/NV;for(let i=0;i<=NX;i++){const u=i/NX;positions.push((u-.5)*22,0,0);uvs.push(u,v);}}
-for(let j=0;j<NV;j++)for(let i=0;i<NX;i++){const a=j*(NX+1)+i,b=a+1,c=a+NX+1,d=c+1;indices.push(a,c,b,b,c,d);}
-const waveGeo=new THREE.BufferGeometry();waveGeo.setAttribute('position',new THREE.Float32BufferAttribute(positions,3));waveGeo.setAttribute('uv',new THREE.Float32BufferAttribute(uvs,2));waveGeo.setIndex(indices);
-const waveMat=new THREE.ShaderMaterial({uniforms:{uTime:{value:0},uFoam:{value:new THREE.Color(0xdffff8)},uDeep:{value:new THREE.Color(0x00506b)},uMid:{value:new THREE.Color(0x06a9bb)},uTop:{value:new THREE.Color(0x86f3e2)}},vertexShader:`uniform float uTime;varying vec2 vUv;varying vec3 vPos;void main(){vUv=uv;float u=uv.x;float v=uv.y;float endFade=pow(max(0.,sin(3.14159265*u)),.48);float faceHeight=4.15+1.0*endFade;float theta=-1.34+v*2.92;float radius=1.28+0.25*endFade;float curl=pow(smoothstep(.55,.99,v),1.65)*endFade;float wobble=sin(u*14.0+uTime*1.2)*.07+sin(u*31.0-uTime*1.7)*.025;float x=(u-.5)*22.0+endFade*curl*.65;float y=.1+v*faceHeight-1.05*curl;float z=-2.15+radius*(1.0-cos(theta))*.72+curl*1.65+wobble; y+=sin(theta)*.32*endFade;vec3 p=vec3(x,y,z);vPos=p;gl_Position=projectionMatrix*modelViewMatrix*vec4(p,1.);}`,fragmentShader:`uniform float uTime;uniform vec3 uFoam;uniform vec3 uDeep;uniform vec3 uMid;uniform vec3 uTop;varying vec2 vUv;varying vec3 vPos;float hash(vec2 p){return fract(sin(dot(p,vec2(127.1,311.7)))*43758.5453);}void main(){float v=vUv.y;float grain=hash(floor(vPos.xy*32.));float bands=sin(vPos.x*2.3+sin(vPos.y*2.0+uTime)*1.5+uTime*1.4)*.5+.5;float streak=pow(max(0.,sin(vPos.x*3.0+uTime*1.1)*cos(vPos.y*3.7-uTime)),8.);vec3 col=mix(uDeep,uMid,smoothstep(.0,.62,v));col=mix(col,uTop,smoothstep(.7,1.,v)*.55);col*=.72+bands*.32;col+=vec3(.04,.17,.17)*streak;float foamNoise=hash(floor(vPos.xy*23.+uTime));float lip=smoothstep(.84,.96,v);float broken=step(.58,foamNoise+bands*.25);float foam=lip*broken;col=mix(col,uFoam,foam*.88);col*=.96+grain*.08;gl_FragColor=vec4(col,1.);}`,side:THREE.DoubleSide,transparent:false});
-const wave=new THREE.Mesh(waveGeo,waveMat);scene.add(wave);
-// Curled lip ribbon and translucent spray veil follow the crest.
-const lipCurve=new THREE.CatmullRomCurve3(Array.from({length:90},(_,i)=>{const u=i/89;const x=(u-.5)*22;const s=Math.sin(Math.PI*u);return new THREE.Vector3(x,4.35+1.15*Math.pow(s,.6),-.4+1.55*Math.pow(s,.6));}));
-const lip=new THREE.Mesh(new THREE.TubeGeometry(lipCurve,220,.105,8,false),new THREE.MeshStandardMaterial({color:0xc9fff1,roughness:.23,metalness:.05,emissive:0x2f8c91,emissiveIntensity:.23}));scene.add(lip);
-const foamMat=new THREE.MeshStandardMaterial({color:0xf0fff9,roughness:.9,transparent:true,opacity:.82});
-const foamGroup=new THREE.Group();scene.add(foamGroup);
-for(let i=0;i<230;i++){const r=.025+Math.random()*.095;const m=new THREE.Mesh(new THREE.IcosahedronGeometry(r,1),foamMat);m.position.set((Math.random()-.5)*22,3.8+Math.random()*1.4,-.2+Math.random()*2);m.userData={phase:Math.random()*6.28,baseY:m.position.y,speed:.3+Math.random()*1.4};foamGroup.add(m)}
-// Board and stylized but dimensional surfer, grouped for carving and aerials.
-const surfer=new THREE.Group();scene.add(surfer);
-const board=new THREE.Mesh(new THREE.CapsuleGeometry(.19,1.65,4,10),new THREE.MeshStandardMaterial({color:0xf3f4df,roughness:.32,metalness:.05}));board.rotation.z=Math.PI/2;board.scale.set(.78,.65,1);board.position.y=.22;surfer.add(board);
-const wetsuit=new THREE.MeshStandardMaterial({color:0x102f45,roughness:.72});
-const skin=new THREE.MeshStandardMaterial({color:0xb97952,roughness:.8});
-const suitBody=new THREE.Mesh(new THREE.CapsuleGeometry(.17,.56,5,8),wetsuit);suitBody.position.set(0,.95,0);suitBody.rotation.z=-.18;surfer.add(suitBody);
-const head=new THREE.Mesh(new THREE.SphereGeometry(.14,14,10),skin);head.position.set(.02,1.42,0);surfer.add(head);
-function limb(a,b,r,mat){const d=new THREE.Vector3().subVectors(b,a);const m=new THREE.Mesh(new THREE.CylinderGeometry(r*.72,r,d.length(),8),mat);m.position.copy(a).add(b).multiplyScalar(.5);m.quaternion.setFromUnitVectors(new THREE.Vector3(0,1,0),d.normalize());surfer.add(m)}
-limb(new THREE.Vector3(0,1.15,0),new THREE.Vector3(-.42,.95,.05),.07,wetsuit);limb(new THREE.Vector3(0,1.15,0),new THREE.Vector3(.4,1.02,-.08),.07,wetsuit);
-limb(new THREE.Vector3(0,.72,0),new THREE.Vector3(-.25,.36,.12),.085,wetsuit);limb(new THREE.Vector3(0,.72,0),new THREE.Vector3(.28,.34,-.12),.085,wetsuit);
-surfer.position.set(-1.2,1.0,1.0);surfer.rotation.y=-.22;
-// A few airborne water droplets in front of the face.
-const drops=new THREE.Group();scene.add(drops);for(let i=0;i<95;i++){const m=new THREE.Mesh(new THREE.SphereGeometry(.025+Math.random()*.045,6,5),new THREE.MeshBasicMaterial({color:0xd4fff7,transparent:true,opacity:.72}));m.userData={phase:Math.random()*6.28,amp:.3+Math.random()*1.5};drops.add(m)}
-let time=0,height=.54,steer=0,airUntil=0;
-function moveHeight(d){height=THREE.MathUtils.clamp(height+d,.12,.92)}
-document.getElementById('up').addEventListener('click',()=>moveHeight(.09));document.getElementById('down').addEventListener('click',()=>moveHeight(-.09));
-document.getElementById('carve').addEventListener('click',()=>{steer=steer===0?1:-steer;surfer.rotation.z=steer*.12;surfer.rotation.y=steer*.35;});
-document.getElementById('air').addEventListener('click',()=>{airUntil=time+1.05;surfer.rotation.z=-.38;});
-document.getElementById('reset').addEventListener('click',()=>{height=.54;steer=0;surfer.rotation.set(0,-.22,0);airUntil=0;});
-const title=document.getElementById('title');
-function animate(){requestAnimationFrame(animate);const dt=Math.min(.04,clock.getDelta());time+=dt;oceanMat.uniforms.uTime.value=time;waveMat.uniforms.uTime.value=time;
-const y=.25+height*3.65;surfer.position.y=y+(time<airUntil?Math.sin((time-(airUntil-1.05))*Math.PI)*1.35:0);surfer.position.x=-1.1+Math.sin(time*.32)*.42+steer*.28;surfer.position.z=.8+Math.sin(time*.8)*.08;
-surfer.rotation.x=Math.sin(time*1.1)*.025;surfer.rotation.z+=(time<airUntil?-.38:steer*.1-surfer.rotation.z)*Math.min(1,dt*4);
-lip.rotation.y=Math.sin(time*.3)*.018;foamGroup.children.forEach((m,i)=>{m.position.x+=Math.sin(time*m.userData.speed+m.userData.phase)*dt*.09;m.position.y=m.userData.baseY+Math.sin(time*1.8+m.userData.phase)*.14;m.scale.setScalar(.75+.25*Math.sin(time*3+m.userData.phase))});
-drops.children.forEach((m,i)=>{const p=m.userData.phase;m.position.set(2.1+Math.sin(time*1.3+p)*m.userData.amp,2.8+Math.abs(Math.sin(time*1.9+p))*2.4,-.2+Math.cos(time+p)*.9)});
-camera.position.x=Math.sin(time*.14)*.28;camera.lookAt(0,2.6,-1.5);document.getElementById('speed').textContent='VELOCIDAD '+Math.round(60+Math.sin(time)*4+Math.abs(steer)*5)+'%';
-renderer.render(scene,camera)}
-const clock=new THREE.Clock();animate();
-addEventListener('resize',()=>{camera.aspect=innerWidth/innerHeight;camera.updateProjectionMatrix();renderer.setPixelRatio(Math.min(devicePixelRatio,1.65));renderer.setSize(innerWidth,innerHeight)});
+<canvas id="game" width="480" height="270" aria-label="Juego retro de surf"></canvas>
+<div class="hud"><div class="top"><div>EPYX-STYLE SURF<span class="sub">PIXEL BARREL · SESSION 01</span></div><div class="score">SCORE <span id="score">00000</span><span class="sub" id="status">TRIM · 62 KM/H</span></div></div><div class="bottom"><span id="waveLabel">WAVE 1 / 3</span><span>↑ ↓ ALTURA · CARVE · AÉREO</span></div></div>
+<div class="banner" id="banner"><h1>SHOOT THE CURL!</h1><p>ENTRA EN EL TUBO Y MANTÉN EL EQUILIBRIO</p></div>
+<div class="move"><button id="up" aria-label="Subir por la ola">↑</button><button id="down" aria-label="Bajar por la ola">↓</button></div>
+<div class="controls"><button id="carve">CARVE</button><button id="air">AÉREO</button><button id="restart" class="primary">RESTART ↻</button></div>
+<div class="rotate"><div><span>▱ ↻</span><strong>GIRA EL MÓVIL</strong><p>El surf se juega en horizontal.</p></div></div>
+<script>
+(function(){
+const canvas=document.getElementById('game'),ctx=canvas.getContext('2d');
+ctx.imageSmoothingEnabled=false;
+const W=480,H=270;
+let t=0,score=0,height=.56,speed=1,carve=0,air=0,waveNo=1,barrelTime=0,ended=false;
+const keys={};
+function rect(x,y,w,h,c){ctx.fillStyle=c;ctx.fillRect(Math.round(x),Math.round(y),Math.round(w),Math.round(h))}
+function poly(points,c){ctx.fillStyle=c;ctx.beginPath();ctx.moveTo(points[0][0],points[0][1]);for(let i=1;i<points.length;i++)ctx.lineTo(points[i][0],points[i][1]);ctx.closePath();ctx.fill()}
+function text(s,x,y,size,c){ctx.font='bold '+size+'px monospace';ctx.fillStyle=c;ctx.fillText(s,x,y)}
+function background(){
+const sky=['#6bd1dc','#8de0d9','#b2e9d2'];for(let y=0;y<160;y+=6)rect(0,y,W,6,sky[Math.min(2,Math.floor(y/60))]);
+rect(0,118,W,3,'#f8df89');rect(0,121,W,8,'#56b6c1');rect(0,129,W,12,'#318fa9');
+rect(35,35,46,6,'#e6f6d7');rect(24,41,64,6,'#e6f6d7');rect(310,55,38,6,'#e6f6d7');rect(300,61,56,6,'#e6f6d7');
+rect(365,28,26,26,'#ffe66d');rect(371,22,14,6,'#ffe66d');rect(371,54,14,6,'#ffe66d');
+for(let i=0;i<14;i++){let x=((i*47-t*12)%520+520)%520;rect(x,133+(i%3)*4,20,2,'#c3f3dc')}
+}
+function drawWave(){
+/* Side-on stepped silhouette: the curl folds left over a dark, readable barrel cavity. */
+const drift=(t*9)%60, crestX=330+Math.sin(t*.4)*8, crestY=70+Math.sin(t*.7)*5;
+poly([[0,158],[40,154],[80,149],[120,140],[160,128],[200,111],[235,94],[260,79],[crestX-24,crestY+2],[crestX-34,crestY-8],[crestX-48,crestY-11],[crestX-62,crestY-5],[crestX-73,crestY+8],[crestX-76,crestY+23],[crestX-68,crestY+34],[crestX-56,crestY+38],[crestX-44,crestY+31],[crestX-38,crestY+22],[crestX-33,crestY+16],[crestX-25,crestY+17],[crestX-17,crestY+29],[crestX-12,crestY+45],[crestX-8,crestY+66],[crestX-2,crestY+89],[crestX+8,crestY+116],[crestX+25,crestY+145],[crestX+48,crestY+175],[480,270],[0,270]],'#087f9c');
+/* Deep shaded face with stepped turquoise highlights. */
+poly([[0,174],[48,166],[94,155],[140,141],[185,121],[220,104],[253,86],[281,73],[305,66],[crestX-34,crestY-8],[crestX-48,crestY-11],[crestX-62,crestY-5],[crestX-73,crestY+8],[crestX-76,crestY+23],[crestX-68,crestY+34],[crestX-56,crestY+38],[crestX-44,crestY+31],[crestX-38,crestY+22],[crestX-33,crestY+16],[crestX-25,crestY+17],[crestX-17,crestY+29],[crestX-12,crestY+45],[crestX-8,crestY+66],[crestX-2,crestY+89],[crestX+8,crestY+116],[crestX+25,crestY+145],[crestX+48,crestY+175],[480,270],[0,270]],'#11b5bd');
+poly([[0,204],[62,188],[118,168],[168,146],[210,124],[245,105],[272,88],[297,76],[crestX-47,crestY-1],[crestX-61,crestY+6],[crestX-67,crestY+17],[crestX-63,crestY+27],[crestX-54,crestY+29],[crestX-44,crestY+22],[crestX-35,crestY+27],[crestX-25,crestY+45],[crestX-16,crestY+72],[crestX-3,crestY+105],[crestX+15,crestY+139],[crestX+42,crestY+177],[480,270],[0,270]],'#08758e');
+/* The hollow tunnel is cut out visually with the sky/deep-water palette. */
+poly([[crestX-69,crestY+12],[crestX-61,crestY+1],[crestX-49,crestY-3],[crestX-38,crestY+2],[crestX-31,crestY+13],[crestX-27,crestY+27],[crestX-31,crestY+40],[crestX-40,crestY+51],[crestX-52,crestY+58],[crestX-65,crestY+61],[crestX-77,crestY+57],[crestX-84,crestY+47],[crestX-85,crestY+34]],'#06475f');
+/* White lip and chunky foam tiles. */
+poly([[260,79],[281,65],[304,58],[crestX-35,crestY-13],[crestX-49,crestY-18],[crestX-63,crestY-12],[crestX-74,crestY+1],[crestX-78,crestY+11],[crestX-67,crestY+7],[crestX-58,crestY-1],[crestX-47,crestY-5],[crestX-36,crestY+2],[crestX-25,crestY+17],[crestX-17,crestY+38],[crestX-12,crestY+62],[crestX-2,crestY+85],[crestX+5,crestY+91],[crestX+1,crestY+68],[crestX-4,crestY+44],[crestX-10,crestY+25],[crestX-18,crestY+9],[crestX-29,crestY-2]],'#f3fff0');
+for(let i=0;i<34;i++){let x=(i*19+t*29)%490;let y=164+Math.sin(i*1.8+t*2)*22;rect(x,y,4+(i%4)*2,2+(i%3)*2,i%3===0?'#efffe8':'#8df3df')}
+for(let i=0;i<18;i++){let x=crestX-75+((i*13+t*22)%100),y=crestY+8+((i*7)%28);rect(x,y,3,3,'#f5fff0')}
+}
+function drawSurfer(){
+const x=170+carve*9, y=194-height*115-(air>0?Math.sin((1-air)*Math.PI)*36:0);
+ctx.save();ctx.translate(Math.round(x),Math.round(y));ctx.rotate(carve*.08+(air>0?-.22:0));
+/* board */
+poly([[-23,7],[-16,3],[19,5],[25,9],[16,12],[-16,11]],'#ffe66d');rect(-14,7,27,2,'#f9fff0');
+/* legs */
+poly([[-5,-4],[1,-4],[7,4],[13,7],[10,10],[2,8],[-3,2]],'#f5bd83');
+poly([[-4,-4],[2,-3],[-4,5],[-10,7],[-13,4],[-7,1]],'#f5bd83');
+/* shorts/body/arms */
+poly([[-6,-19],[5,-20],[10,-8],[3,-3],[-8,-6]],'#ed684e');
+poly([[-4,-18],[-12,-11],[-20,-13],[-21,-10],[-10,-6],[-1,-12]],'#f5bd83');
+poly([[4,-18],[11,-14],[17,-20],[20,-18],[13,-8],[5,-10]],'#f5bd83');
+rect(-6,-28,12,11,'#17435a');rect(-5,-34,10,8,'#b97852');rect(-6,-36,12,4,'#f7d16a');rect(-7,-37,13,3,'#21384c');
+ctx.restore();
+}
+function drawTubeHint(){if(height>.45&&height<.76){rect(244,125,2,2,'#e9fff4');rect(251,130,2,2,'#e9fff4');rect(258,136,2,2,'#e9fff4')}}
+function draw(){
+background();drawWave();drawTubeHint();drawSurfer();
+/* foreground wash */
+for(let i=0;i<20;i++){const x=(i*31-t*20)%510;rect(x,250+(i%3)*4,15,2,'#3dc5c5');rect(x+8,257+(i%2)*3,8,2,'#b7f7df')}
+if(air>0){text('AIR!',187,144,10,'#ffe66d')}
+}
+function tick(){
+t+=.035;
+if(keys.ArrowUp||keys.w)height=Math.min(.92,height+.006);
+if(keys.ArrowDown||keys.s)height=Math.max(.12,height-.006);
+height+=(.54-height)*.003;
+if(air>0)air=Math.max(0,air-.012);
+if(!ended){score+=Math.max(0,Math.round(2+(height>.45&&height<.77?3:0)+Math.abs(carve)*.6));}
+draw();
+document.getElementById('score').textContent=String(score).padStart(5,'0').slice(-5);
+document.getElementById('status').textContent=(height>.45&&height<.77?'IN THE BARREL':'TRIM')+' · '+Math.round(58+height*10)+' KM/H';
+if(t>27*waveNo){waveNo++;if(waveNo>3)waveNo=1;document.getElementById('waveLabel').textContent='WAVE '+waveNo+' / 3';score+=250}
+requestAnimationFrame(tick);
+}
+function changeHeight(n){height=Math.max(.12,Math.min(.92,height+n))}
+document.getElementById('up').addEventListener('click',()=>changeHeight(.08));
+document.getElementById('down').addEventListener('click',()=>changeHeight(-.08));
+document.getElementById('carve').addEventListener('click',()=>{carve=carve===0?1:carve===1?-1:0;score+=35});
+document.getElementById('air').addEventListener('click',()=>{if(air===0){air=1;score+=height>.42&&height<.82?100:20}});
+document.getElementById('restart').addEventListener('click',()=>{t=0;score=0;height=.56;carve=0;air=0;waveNo=1;ended=false;document.getElementById('waveLabel').textContent='WAVE 1 / 3';document.getElementById('banner').style.opacity='0'});
+addEventListener('keydown',e=>{keys[e.key]=true;if(['ArrowUp','ArrowDown',' '].includes(e.key))e.preventDefault();if(e.key===' ')document.getElementById('air').click();if(e.key==='ArrowLeft')document.getElementById('carve').click()});
+addEventListener('keyup',e=>keys[e.key]=false);
+let startY=null;canvas.addEventListener('touchstart',e=>{startY=e.touches[0].clientY},{passive:true});canvas.addEventListener('touchmove',e=>{if(startY!==null){const dy=e.touches[0].clientY-startY;if(Math.abs(dy)>14){changeHeight(dy<0?.025:-.025);startY=e.touches[0].clientY}}},{passive:true});
+tick();
+})();
 </script>
 </body>
 </html>

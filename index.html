@@ -26,16 +26,16 @@
     <section id="start-screen" class="screen start-screen">
       <div class="eyebrow"><span class="pulse-dot"></span> ARCADE SURF EXPERIENCE</div>
       <h1>RIDE THE<br><em>WAVE.</em></h1>
-      <p class="hero-copy">Tres olas. Ocho trucos. Una oportunidad<br class="desktop-break"> para dejar tu marca.</p>
+      <p class="hero-copy">Tres olas. Cuatro trucos. Una oportunidad<br class="desktop-break"> para dejar tu marca.</p>
       <button id="start-btn" class="primary-btn">SURFEAR <span>↗</span></button>
       <div class="start-meta"><span>01—03 OLAS</span><span>TOCA · TRUCO · ATERRIZA</span></div>
-      <div class="mini-controls"><span>← CONTROLA LA TABLA</span><span>TRUCOS →</span></div>
+      <div class="mini-controls"><span>↕ SUBE / BAJA LA OLA</span><span>4 TRUCOS →</span></div>
     </section>
     <section id="tutorial-screen" class="screen tutorial-screen hidden">
       <div class="eyebrow">ANTES DE ENTRAR AL AGUA</div><h2>ENCUENTRA<br><em>TU RITMO.</em></h2>
       <div class="instruction-grid">
-        <div><span class="instruction-icon">↔</span><b>MANO IZQUIERDA</b><p>Arrastra para cambiar trayectoria. Mantén hacia arriba para ganar velocidad; hacia abajo para estabilizarte.</p></div>
-        <div><span class="instruction-icon">✦</span><b>MANO DERECHA</b><p>Elige un truco. Los aéreos dan más puntos, pero necesitan velocidad y equilibrio.</p></div>
+        <div><span class="instruction-icon">↔</span><b>MANO IZQUIERDA</b><p>Arrastra arriba y abajo para subir o bajar por la pared de la ola. Muévete a los lados para cambiar la línea y ganar velocidad.</p></div>
+        <div><span class="instruction-icon">✦</span><b>MANO DERECHA</b><p>Pulsa Carve, Cutback, Snap o Aéreo en el momento adecuado. La velocidad y tu posición influyen en la puntuación.</p></div>
       </div>
       <button id="tutorial-go" class="primary-btn">ENTENDIDO <span>↗</span></button>
       <button id="skip-tutorial" class="text-btn">SALTAR TUTORIAL</button>
@@ -46,16 +46,12 @@
     <div id="orientation-screen" class="orientation-screen hidden"><div class="rotate-icon">▱<span>↻</span></div><b>GIRA TU PANTALLA</b><p>SURF ARCADE se juega en horizontal.</p></div>
     <footer id="game-footer" class="game-footer hidden"><span id="status-message">BUSCA LA LÍNEA</span><span>KEEP IT FLOWING <b>●</b></span></footer>
     <section id="controls" class="controls hidden" aria-label="Controles táctiles">
-      <div class="steer-area" id="steer-area"><div class="steer-ring"><span>↔</span><small>DIRIGE</small></div><div class="steer-hint">↑ VELOCIDAD&nbsp;&nbsp; ↓ CONTROL</div></div>
+      <div class="steer-area" id="steer-area"><div class="steer-ring"><span>↔</span><small>DIRIGE</small></div><div class="steer-hint">↑ SUBE&nbsp;&nbsp; ↓ BAJA</div></div>
       <div class="trick-controls">
-        <button class="trick-btn" data-trick="bottomTurn"><span class="trick-symbol">↘</span><span class="trick-name">TURN</span><small>100</small></button>
-        <button class="trick-btn" data-trick="cutback"><span class="trick-symbol">↶</span><span class="trick-name">CUTBACK</span><small>150</small></button>
-        <button class="trick-btn" data-trick="snap"><span class="trick-symbol">⌁</span><span class="trick-name">SNAP</span><small>250</small></button>
-        <button class="trick-btn" data-trick="floater"><span class="trick-symbol">≈</span><span class="trick-name">FLOATER</span><small>300</small></button>
-        <button class="trick-btn" data-trick="reentry"><span class="trick-symbol">↗</span><span class="trick-name">RE-ENTRY</span><small>350</small></button>
-        <button class="trick-btn air-btn" data-trick="air"><span class="trick-symbol">↑</span><span class="trick-name">AIR</span><small>450</small></button>
-        <button class="trick-btn air-btn" data-trick="airReverse"><span class="trick-symbol">⤴</span><span class="trick-name">AIR REV</span><small>600</small></button>
-        <button class="trick-btn style-btn" data-trick="aerial360"><span class="trick-symbol">⟳</span><span class="trick-name">360</span><small>800</small></button>
+        <button class="trick-btn" data-trick="carve"><span class="trick-symbol">⌁</span><span class="trick-name">CARVE</span><small>180</small></button>
+        <button class="trick-btn" data-trick="cutback"><span class="trick-symbol">↶</span><span class="trick-name">CUTBACK</span><small>260</small></button>
+        <button class="trick-btn" data-trick="snap"><span class="trick-symbol">✦</span><span class="trick-name">SNAP</span><small>350</small></button>
+        <button class="trick-btn air-btn" data-trick="aerial"><span class="trick-symbol">↗</span><span class="trick-name">AÉREO</span><small>600</small></button>
       </div>
     </section>
     <div id="wave-banner" class="wave-banner hidden"><span>OLA</span><strong id="banner-number">01</strong><i> / 03</i></div>

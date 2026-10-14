@@ -115,8 +115,8 @@ $('sound-btn').addEventListener('click',()=>{soundOn=!soundOn;$('sound-btn').tex
 document.addEventListener('visibilitychange',()=>{if(document.hidden&&mode==='playing')pauseGame()});
 document.querySelectorAll('.trick-btn').forEach(btn=>{const act=e=>{e.preventDefault();btn.classList.add('pressed');trick(btn.dataset.trick);setTimeout(()=>btn.classList.remove('pressed'),180)};btn.addEventListener('pointerdown',act);btn.addEventListener('contextmenu',e=>e.preventDefault())});
 const steerArea=$('steer-area');
-steerArea.addEventListener('pointerdown',e=>{if(mode!=='playing')return;e.preventDefault();steerPointer=e.pointerId;steerArea.setPointerCapture(e.pointerId);targetLane=clamp((e.clientX/W-.25)/.48,0,1);targetDepth=clamp((e.clientY/H-.39)/.42,.08,.9);steerArea.classList.add('active')});
-steerArea.addEventListener('pointermove',e=>{if(e.pointerId!==steerPointer)return;e.preventDefault();targetLane=clamp((e.clientX/W-.25)/.48,0,1);targetDepth=clamp((e.clientY/H-.39)/.42,.08,.9)});
+steerArea.addEventListener('pointerdown',e=>{if(mode!=='playing')return;e.preventDefault();steerPointer=e.pointerId;steerArea.setPointerCapture(e.pointerId);const r=steerArea.getBoundingClientRect();targetLane=clamp((e.clientX-r.left)/r.width,0,1);targetDepth=.08+clamp((e.clientY-r.top)/r.height,0,1)*.82;steerArea.classList.add('active')});
+steerArea.addEventListener('pointermove',e=>{if(e.pointerId!==steerPointer)return;e.preventDefault();const r=steerArea.getBoundingClientRect();targetLane=clamp((e.clientX-r.left)/r.width,0,1);targetDepth=.08+clamp((e.clientY-r.top)/r.height,0,1)*.82});
 function stopSteer(e){if(steerPointer===null||(e&&e.pointerId!==steerPointer))return;steerPointer=null;steerArea.classList.remove('active')}
 steerArea.addEventListener('pointerup',stopSteer);steerArea.addEventListener('pointercancel',stopSteer);steerArea.addEventListener('lostpointercapture',stopSteer);
 function orientationCheck(){const portrait=matchMedia('(orientation: portrait)').matches;$('orientation-screen').classList.toggle('hidden',!(portrait&&mode==='playing'))}

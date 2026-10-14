@@ -1,6 +1,6 @@
 # SURF ARCADE
 
-Juego arcade de surf en HTML5 Canvas, pensado para iPhone en horizontal. Una partida contiene exactamente tres olas, cuatro trucos, combos, caídas, resultados por ola y récord local.
+Juego arcade de surf en HTML5 Canvas, pensado para iPhone en horizontal. La dirección visual actual usa pixel art de 8 bits, paleta cálida retro, ola escalonada con tubo y un surfista dibujado como sprite, inspirados en los juegos deportivos de 8 bits de la era California Games. Una partida contiene exactamente tres olas, cuatro trucos, combos, caídas, resultados por ola y récord local.
 
 ## Jugar localmente
 Abre `index.html` en un navegador moderno o sirve la carpeta con cualquier servidor estático. No requiere Node.js, compilación ni claves de API.

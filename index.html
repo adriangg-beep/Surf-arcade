@@ -1,0 +1,61 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#073B4C">
+  <meta name="description" content="SURF ARCADE: tres olas, ocho trucos y una puntuación que superar.">
+  <title>SURF ARCADE</title>
+  <link rel="stylesheet" href="./styles.css">
+</head>
+<body>
+  <main id="app">
+    <canvas id="surf-canvas" aria-label="Escena del videojuego de surf"></canvas>
+    <div class="grain" aria-hidden="true"></div>
+    <header class="topbar">
+      <div class="brand"><span class="brand-mark">S</span><span>SURF<span class="brand-light"> ARCADE</span></span></div>
+      <div class="top-actions"><button id="sound-btn" class="icon-btn" aria-label="Activar o desactivar sonido" title="Sonido">♫</button><button id="pause-btn" class="icon-btn hidden" aria-label="Pausar partida" title="Pausa">Ⅱ</button></div>
+    </header>
+    <section id="hud" class="hud hidden" aria-live="polite">
+      <div class="hud-score"><small>PUNTOS DE OLA</small><strong id="wave-score">0</strong><span id="total-score">TOTAL 0</span></div>
+      <div class="hud-center"><span id="wave-label" class="wave-pill">OLA 1 / 3</span><div class="wave-track"><span id="wave-progress"></span></div><span id="timer-label">30.0 s</span></div>
+      <div class="hud-combo"><small>COMBO</small><strong id="combo-label">×1.0</strong><div class="balance-track"><span id="balance-fill"></span></div><small>EQUILIBRIO</small></div>
+    </section>
+    <div id="trick-toast" class="trick-toast hidden"><span id="toast-name">SNAP</span><strong id="toast-points">+250</strong></div>
+    <div id="callout" class="callout hidden"></div>
+    <section id="start-screen" class="screen start-screen">
+      <div class="eyebrow"><span class="pulse-dot"></span> ARCADE SURF EXPERIENCE</div>
+      <h1>RIDE THE<br><em>WAVE.</em></h1>
+      <p class="hero-copy">Tres olas. Ocho trucos. Una oportunidad<br class="desktop-break"> para dejar tu marca.</p>
+      <button id="start-btn" class="primary-btn">SURFEAR <span>↗</span></button>
+      <div class="start-meta"><span>01—03 OLAS</span><span>TOCA · TRUCO · ATERRIZA</span></div>
+      <div class="mini-controls"><span>← CONTROLA LA TABLA</span><span>TRUCOS →</span></div>
+    </section>
+    <section id="tutorial-screen" class="screen tutorial-screen hidden">
+      <div class="eyebrow">ANTES DE ENTRAR AL AGUA</div><h2>ENCUENTRA<br><em>TU RITMO.</em></h2>
+      <div class="instruction-grid">
+        <div><span class="instruction-icon">↔</span><b>MANO IZQUIERDA</b><p>Arrastra para cambiar trayectoria. Mantén hacia arriba para ganar velocidad; hacia abajo para estabilizarte.</p></div>
+        <div><span class="instruction-icon">✦</span><b>MANO DERECHA</b><p>Elige un truco. Los aéreos dan más puntos, pero necesitan velocidad y equilibrio.</p></div>
+      </div>
+      <button id="tutorial-go" class="primary-btn">ENTENDIDO <span>↗</span></button>
+      <button id="skip-tutorial" class="text-btn">SALTAR TUTORIAL</button>
+    </section>
+    <section id="pause-screen" class="screen compact-screen hidden"><div class="eyebrow">TOMA AIRE</div><h2>PARTIDA<br><em>EN PAUSA.</em></h2><button id="resume-btn" class="primary-btn">CONTINUAR <span>▶</span></button><button id="restart-btn" class="secondary-btn">REINICIAR PARTIDA</button><button id="home-btn" class="text-btn">VOLVER AL INICIO</button></section>
+    <section id="wave-result" class="screen result-screen hidden"><div class="eyebrow" id="result-eyebrow">OLA COMPLETADA</div><h2 id="result-title">BUENA<br><em>SESIÓN.</em></h2><div class="result-number" id="result-score">0</div><div class="result-caption">PUNTOS DE OLA</div><div class="result-stats"><div><small>TRUCOS</small><b id="result-tricks">0</b></div><div><small>MEJOR COMBO</small><b id="result-combo">×1.0</b></div><div><small>CAÍDAS</small><b id="result-falls">0</b></div></div><button id="next-wave-btn" class="primary-btn">SIGUIENTE OLA <span>↗</span></button></section>
+    <section id="final-screen" class="screen final-screen hidden"><div class="eyebrow">SESIÓN COMPLETADA · 03/03</div><h2>HECHA PARA<br><em>VOLVER.</em></h2><div id="final-score" class="result-number">0</div><div class="result-caption">PUNTUACIÓN TOTAL</div><div class="rank-pill" id="rank-label">WAVE RIDER</div><div class="final-stats"><div><small>MEJOR TRUCO</small><b id="final-best">—</b></div><div><small>MEJOR COMBO</small><b id="final-combo">×1.0</b></div><div><small>RÉCORD PERSONAL</small><b id="final-record">0</b></div></div><div class="wave-breakdown" id="wave-breakdown"></div><button id="play-again-btn" class="primary-btn">OTRA PARTIDA <span>↗</span></button><button id="final-home-btn" class="text-btn">VOLVER AL INICIO</button></section>
+    <div id="orientation-screen" class="orientation-screen hidden"><div class="rotate-icon">▱<span>↻</span></div><b>GIRA TU PANTALLA</b><p>SURF ARCADE se juega en horizontal.</p></div>
+    <footer id="game-footer" class="game-footer hidden"><span id="status-message">BUSCA LA LÍNEA</span><span>KEEP IT FLOWING <b>●</b></span></footer>
+    <section id="controls" class="controls hidden" aria-label="Controles táctiles">
+      <div class="steer-area" id="steer-area"><div class="steer-ring"><span>↔</span><small>DIRIGE</small></div><div class="steer-hint">↑ VELOCIDAD&nbsp;&nbsp; ↓ CONTROL</div></div>
+      <div class="trick-controls">
+        <button class="trick-btn" data-trick="bottomTurn"><span class="trick-symbol">↘</span><span class="trick-name">TURN</span><small>100</small></button>
+        <button class="trick-btn" data-trick="snap"><span class="trick-symbol">⌁</span><span class="trick-name">SNAP</span><small>250</small></button>
+        <button class="trick-btn air-btn" data-trick="air"><span class="trick-symbol">↑</span><span class="trick-name">AIR</span><small>450</small></button>
+        <button class="trick-btn style-btn" data-trick="aerial360"><span class="trick-symbol">⟳</span><span class="trick-name">360</span><small>800</small></button>
+      </div>
+    </section>
+    <div id="wave-banner" class="wave-banner hidden"><span>OLA</span><strong id="banner-number">01</strong><i> / 03</i></div>
+  </main>
+  <script src="./js/game.js" defer></script>
+</body>
+</html>

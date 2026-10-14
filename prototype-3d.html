@@ -17,82 +17,92 @@
 <div class="controls"><button id="carve">CARVE</button><button id="air">AÉREO</button><button id="restart" class="primary">RESTART ↻</button></div>
 <div class="rotate"><div><span>▱ ↻</span><strong>GIRA EL MÓVIL</strong><p>El surf se juega en horizontal.</p></div></div>
 <script>
-(function(){
-const canvas=document.getElementById('game'),ctx=canvas.getContext('2d');
-ctx.imageSmoothingEnabled=false;
-const W=480,H=270;
-let t=0,score=0,height=.56,speed=1,carve=0,air=0,waveNo=1,barrelTime=0,ended=false;
-const keys={};
-function rect(x,y,w,h,c){ctx.fillStyle=c;ctx.fillRect(Math.round(x),Math.round(y),Math.round(w),Math.round(h))}
-function poly(points,c){ctx.fillStyle=c;ctx.beginPath();ctx.moveTo(points[0][0],points[0][1]);for(let i=1;i<points.length;i++)ctx.lineTo(points[i][0],points[i][1]);ctx.closePath();ctx.fill()}
-function text(s,x,y,size,c){ctx.font='bold '+size+'px monospace';ctx.fillStyle=c;ctx.fillText(s,x,y)}
-function background(){
-const sky=['#6bd1dc','#8de0d9','#b2e9d2'];for(let y=0;y<160;y+=6)rect(0,y,W,6,sky[Math.min(2,Math.floor(y/60))]);
-rect(0,118,W,3,'#f8df89');rect(0,121,W,8,'#56b6c1');rect(0,129,W,12,'#318fa9');
-rect(35,35,46,6,'#e6f6d7');rect(24,41,64,6,'#e6f6d7');rect(310,55,38,6,'#e6f6d7');rect(300,61,56,6,'#e6f6d7');
-rect(365,28,26,26,'#ffe66d');rect(371,22,14,6,'#ffe66d');rect(371,54,14,6,'#ffe66d');
-for(let i=0;i<14;i++){let x=((i*47-t*12)%520+520)%520;rect(x,133+(i%3)*4,20,2,'#c3f3dc')}
+(()=> {
+const c=document.getElementById('game'),g=c.getContext('2d'),W=480,H=270;
+g.imageSmoothingEnabled=false;
+const $=id=>document.getElementById(id);
+let time=0,score=0,height=.52,carve=0,air=0,airStart=0,wave=1,waveClock=0,combo=0,gameState='ride',bannerTimer=3.8,foamSeed=0,last=0;
+const keys={}; let touchY=null;
+const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
+function box(x,y,w,h,col){g.fillStyle=col;g.fillRect(Math.round(x),Math.round(y),Math.round(w),Math.round(h))}
+function polygon(pts,col){g.fillStyle=col;g.beginPath();g.moveTo(pts[0][0],pts[0][1]);for(let i=1;i<pts.length;i++)g.lineTo(pts[i][0],pts[i][1]);g.closePath();g.fill()}
+function label(s,x,y,size,col){g.font='bold '+size+'px monospace';g.fillStyle=col;g.fillText(s,x,y)}
+function bg(){
+ const sky=['#65c8d5','#7bd8d9','#a6e7d8'];for(let y=0;y<150;y+=5)box(0,y,W,5,sky[Math.min(2,Math.floor(y/55))]);
+ box(0,116,W,2,'#f8e59a');box(0,119,W,7,'#64b9c2');box(0,126,W,7,'#318da5');
+ box(36,39,45,5,'#e4f5dd');box(26,44,63,5,'#e4f5dd');box(315,55,38,5,'#e4f5dd');box(305,60,57,5,'#e4f5dd');
+ box(369,25,24,24,'#ffe66d');box(375,19,12,5,'#ffe66d');box(375,50,12,5,'#ffe66d');
+ for(let i=0;i<12;i++){let x=((i*49-time*7)%510+510)%510;box(x,135+(i%3)*4,17,2,'#c3f3dc')}
 }
-function drawWave(){
-/* Side-on stepped silhouette: the curl folds left over a dark, readable barrel cavity. */
-const drift=(t*9)%60, crestX=330+Math.sin(t*.4)*8, crestY=70+Math.sin(t*.7)*5;
-poly([[0,158],[40,154],[80,149],[120,140],[160,128],[200,111],[235,94],[260,79],[crestX-24,crestY+2],[crestX-34,crestY-8],[crestX-48,crestY-11],[crestX-62,crestY-5],[crestX-73,crestY+8],[crestX-76,crestY+23],[crestX-68,crestY+34],[crestX-56,crestY+38],[crestX-44,crestY+31],[crestX-38,crestY+22],[crestX-33,crestY+16],[crestX-25,crestY+17],[crestX-17,crestY+29],[crestX-12,crestY+45],[crestX-8,crestY+66],[crestX-2,crestY+89],[crestX+8,crestY+116],[crestX+25,crestY+145],[crestX+48,crestY+175],[480,270],[0,270]],'#087f9c');
-/* Deep shaded face with stepped turquoise highlights. */
-poly([[0,174],[48,166],[94,155],[140,141],[185,121],[220,104],[253,86],[281,73],[305,66],[crestX-34,crestY-8],[crestX-48,crestY-11],[crestX-62,crestY-5],[crestX-73,crestY+8],[crestX-76,crestY+23],[crestX-68,crestY+34],[crestX-56,crestY+38],[crestX-44,crestY+31],[crestX-38,crestY+22],[crestX-33,crestY+16],[crestX-25,crestY+17],[crestX-17,crestY+29],[crestX-12,crestY+45],[crestX-8,crestY+66],[crestX-2,crestY+89],[crestX+8,crestY+116],[crestX+25,crestY+145],[crestX+48,crestY+175],[480,270],[0,270]],'#11b5bd');
-poly([[0,204],[62,188],[118,168],[168,146],[210,124],[245,105],[272,88],[297,76],[crestX-47,crestY-1],[crestX-61,crestY+6],[crestX-67,crestY+17],[crestX-63,crestY+27],[crestX-54,crestY+29],[crestX-44,crestY+22],[crestX-35,crestY+27],[crestX-25,crestY+45],[crestX-16,crestY+72],[crestX-3,crestY+105],[crestX+15,crestY+139],[crestX+42,crestY+177],[480,270],[0,270]],'#08758e');
-/* The hollow tunnel is cut out visually with the sky/deep-water palette. */
-poly([[crestX-69,crestY+12],[crestX-61,crestY+1],[crestX-49,crestY-3],[crestX-38,crestY+2],[crestX-31,crestY+13],[crestX-27,crestY+27],[crestX-31,crestY+40],[crestX-40,crestY+51],[crestX-52,crestY+58],[crestX-65,crestY+61],[crestX-77,crestY+57],[crestX-84,crestY+47],[crestX-85,crestY+34]],'#06475f');
-/* White lip and chunky foam tiles. */
-poly([[260,79],[281,65],[304,58],[crestX-35,crestY-13],[crestX-49,crestY-18],[crestX-63,crestY-12],[crestX-74,crestY+1],[crestX-78,crestY+11],[crestX-67,crestY+7],[crestX-58,crestY-1],[crestX-47,crestY-5],[crestX-36,crestY+2],[crestX-25,crestY+17],[crestX-17,crestY+38],[crestX-12,crestY+62],[crestX-2,crestY+85],[crestX+5,crestY+91],[crestX+1,crestY+68],[crestX-4,crestY+44],[crestX-10,crestY+25],[crestX-18,crestY+9],[crestX-29,crestY-2]],'#f3fff0');
-for(let i=0;i<34;i++){let x=(i*19+t*29)%490;let y=164+Math.sin(i*1.8+t*2)*22;rect(x,y,4+(i%4)*2,2+(i%3)*2,i%3===0?'#efffe8':'#8df3df')}
-for(let i=0;i<18;i++){let x=crestX-75+((i*13+t*22)%100),y=crestY+8+((i*7)%28);rect(x,y,3,3,'#f5fff0')}
+function waveShape(){
+ const phase=time*.55, crest=305+Math.sin(phase)*7, top=76+Math.sin(time*.9)*4;
+ // Body of the wave: the profile grows from the lower-left into a tall pitching crest.
+ const outer=[[0,190],[35,181],[70,170],[105,157],[140,142],[175,125],[208,106],[238,88],[264,72],[286,top+2],[crest-26,top-3],[crest-43,top-9],[crest-57,top-5],[crest-68,top+5],[crest-70,top+18],[crest-64,top+31],[crest-52,top+40],[crest-42,top+48],[crest-32,top+64],[crest-23,top+86],[crest-11,top+113],[crest+7,top+143],[crest+28,top+172],[crest+52,top+199],[480,270],[0,270]];
+ polygon(outer,'#087b98');
+ const face=[[0,207],[42,194],[83,179],[122,161],[160,142],[196,121],[229,101],[255,83],[280,top+3],[crest-28,top-3],[crest-44,top-9],[crest-58,top-5],[crest-69,top+5],[crest-70,top+18],[crest-64,top+31],[crest-52,top+40],[crest-42,top+48],[crest-32,top+64],[crest-23,top+86],[crest-11,top+113],[crest+7,top+143],[crest+28,top+172],[crest+52,top+199],[480,270],[0,270]];
+ polygon(face,'#0bb1bc');
+ polygon([[0,229],[48,211],[92,192],[135,170],[173,148],[210,124],[244,103],[270,top+17],[crest-50,top+5],[crest-62,top+12],[crest-64,top+23],[crest-56,top+33],[crest-45,top+37],[crest-34,top+49],[crest-25,top+71],[crest-14,top+100],[crest+4,top+137],[crest+31,top+180],[crest+55,top+205],[480,270],[0,270]],'#08738c');
+ // Hollow barrel cavity and dark inner shadow.
+ polygon([[crest-68,top+13],[crest-61,top+1],[crest-49,top-4],[crest-38,top+1],[crest-30,top+12],[crest-27,top+25],[crest-31,top+39],[crest-40,top+51],[crest-53,top+59],[crest-66,top+61],[crest-78,top+56],[crest-84,top+45],[crest-85,top+32]],'#06445d');
+ // inner turquoise reflected light makes the hollow read as a tunnel, not a hole.
+ polygon([[crest-74,top+34],[crest-68,top+24],[crest-58,top+18],[crest-48,top+21],[crest-42,top+31],[crest-43,top+41],[crest-52,top+49],[crest-64,top+52],[crest-74,top+47]],'#087f91');
+ // Lip: bright foam curls over the hollow.
+ polygon([[256,79],[278,64],[300,top-4],[crest-35,top-15],[crest-49,top-18],[crest-63,top-12],[crest-74,top],[crest-79,top+11],[crest-69,top+8],[crest-59,top],[crest-47,top-5],[crest-36,top+2],[crest-26,top+18],[crest-19,top+39],[crest-13,top+62],[crest-4,top+84],[crest+5,top+94],[crest+2,top+70],[crest-4,top+45],[crest-10,top+24],[crest-18,top+8],[crest-28,top-3]],'#f1fff0');
+ // pixel foam attached to the breaking edge; the pattern travels with the wave.
+ for(let i=0;i<45;i++){const x=(i*17+time*28)%500;const y=157+Math.sin(i*1.9+time*2)*26;box(x,y,3+(i%3)*2,2+(i%2)*2,i%4===0?'#f5fff0':'#9af1df')}
+ for(let i=0;i<22;i++){const x=crest-78+((i*11+time*16)%100),y=top+6+((i*7)%32);box(x,y,3,3,'#f5fff0')}
+ // Foreground wash.
+ for(let i=0;i<20;i++){let x=((i*31-time*17)%510+510)%510;box(x,250+(i%3)*4,15,2,'#3dc5c5');box(x+8,257+(i%2)*3,8,2,'#b7f7df')}
+ return {crest,top};
 }
-function drawSurfer(){
-const x=170+carve*9, y=194-height*115-(air>0?Math.sin((1-air)*Math.PI)*36:0);
-ctx.save();ctx.translate(Math.round(x),Math.round(y));ctx.rotate(carve*.08+(air>0?-.22:0));
-/* board */
-poly([[-23,7],[-16,3],[19,5],[25,9],[16,12],[-16,11]],'#ffe66d');rect(-14,7,27,2,'#f9fff0');
-/* legs */
-poly([[-5,-4],[1,-4],[7,4],[13,7],[10,10],[2,8],[-3,2]],'#f5bd83');
-poly([[-4,-4],[2,-3],[-4,5],[-10,7],[-13,4],[-7,1]],'#f5bd83');
-/* shorts/body/arms */
-poly([[-6,-19],[5,-20],[10,-8],[3,-3],[-8,-6]],'#ed684e');
-poly([[-4,-18],[-12,-11],[-20,-13],[-21,-10],[-10,-6],[-1,-12]],'#f5bd83');
-poly([[4,-18],[11,-14],[17,-20],[20,-18],[13,-8],[5,-10]],'#f5bd83');
-rect(-6,-28,12,11,'#17435a');rect(-5,-34,10,8,'#b97852');rect(-6,-36,12,4,'#f7d16a');rect(-7,-37,13,3,'#21384c');
-ctx.restore();
+function surfer(){
+ const x=158+carve*5;
+ // Height maps to the wave face. The board is carried by the wave, not fixed in place.
+ const waveSurface=208-height*126;
+ const jump=air>0?Math.sin(clamp((time-airStart)/.9,0,1)*Math.PI)*40:0;
+ const y=waveSurface-jump;
+ g.save();g.translate(Math.round(x),Math.round(y));g.rotate(carve*.07+(air>0?-.28:0));
+ // board, rails and tail
+ polygon([[-25,7],[-18,3],[19,4],[26,8],[17,12],[-17,11]],'#ffe66d');box(-15,7,28,2,'#f8fff0');box(-22,8,5,2,'#f08b55');
+ // legs and bent stance
+ polygon([[-5,-5],[1,-5],[7,3],[14,6],[11,10],[2,8],[-3,2]],'#f5bd83');
+ polygon([[-4,-5],[2,-3],[-4,5],[-10,7],[-13,4],[-7,1]],'#f5bd83');
+ polygon([[-6,-20],[5,-20],[10,-8],[3,-3],[-8,-6]],'#ef684e');
+ polygon([[-4,-18],[-12,-11],[-20,-13],[-21,-10],[-10,-6],[-1,-12]],'#f5bd83');
+ polygon([[4,-18],[11,-14],[17,-20],[20,-18],[13,-8],[5,-10]],'#f5bd83');
+ box(-6,-29,12,12,'#17435a');box(-5,-35,10,8,'#b97852');box(-6,-37,12,4,'#f7d16a');box(-7,-38,13,3,'#21384c');
+ g.restore();
+ if(air>0)label('AIR!',x+13,y-40,9,'#ffe66d');
 }
-function drawTubeHint(){if(height>.45&&height<.76){rect(244,125,2,2,'#e9fff4');rect(251,130,2,2,'#e9fff4');rect(258,136,2,2,'#e9fff4')}}
 function draw(){
-background();drawWave();drawTubeHint();drawSurfer();
-/* foreground wash */
-for(let i=0;i<20;i++){const x=(i*31-t*20)%510;rect(x,250+(i%3)*4,15,2,'#3dc5c5');rect(x+8,257+(i%2)*3,8,2,'#b7f7df')}
-if(air>0){text('AIR!',187,144,10,'#ffe66d')}
+ bg();const w=waveShape();surfer();
+ // Small board wake and spray show contact with the moving water.
+ for(let i=0;i<7;i++){box(130-i*5,208-height*126+8+(i%3)*3,3,2,i%2?'#f0fff0':'#73e5d5')}
+ if(height>.42&&height<.74){box(217,138,2,2,'#f4fff0');box(225,143,2,2,'#f4fff0');box(233,148,2,2,'#f4fff0')}
+ if(gameState==='wipeout'){box(125,185,38,3,'#fff');label('WIPEOUT!',178,155,13,'#ffe66d')}
 }
-function tick(){
-t+=.035;
-if(keys.ArrowUp||keys.w)height=Math.min(.92,height+.006);
-if(keys.ArrowDown||keys.s)height=Math.max(.12,height-.006);
-height+=Math.sin(t*.55)*.0009;
-if(air>0)air=Math.max(0,air-.012);
-if(!ended){score+=Math.max(0,Math.round(2+(height>.45&&height<.77?3:0)+Math.abs(carve)*.6));}
-draw();
-document.getElementById('score').textContent=String(score).padStart(5,'0').slice(-5);
-document.getElementById('status').textContent=(height>.45&&height<.77?'IN THE BARREL':'TRIM')+' · '+Math.round(58+height*10)+' KM/H';
-if(t>27*waveNo){waveNo++;if(waveNo>3)waveNo=1;document.getElementById('waveLabel').textContent='WAVE '+waveNo+' / 3';score+=250}
-requestAnimationFrame(tick);
-}
-function changeHeight(n){height=Math.max(.12,Math.min(.92,height+n))}
-document.getElementById('up').addEventListener('click',()=>changeHeight(.08));
-document.getElementById('down').addEventListener('click',()=>changeHeight(-.08));
-document.getElementById('carve').addEventListener('click',()=>{carve=carve===0?1:carve===1?-1:0;score+=35});
-document.getElementById('air').addEventListener('click',()=>{if(air===0){air=1;score+=height>.42&&height<.82?100:20}});
-document.getElementById('restart').addEventListener('click',()=>{t=0;score=0;height=.56;carve=0;air=0;waveNo=1;ended=false;document.getElementById('waveLabel').textContent='WAVE 1 / 3';document.getElementById('banner').style.opacity='0'});
-addEventListener('keydown',e=>{keys[e.key]=true;if(['ArrowUp','ArrowDown',' '].includes(e.key))e.preventDefault();if(e.key===' ')document.getElementById('air').click();if(e.key==='ArrowLeft')document.getElementById('carve').click()});
+function changeHeight(d){height=clamp(height+d,.1,.93)}
+function trickAir(){if(air<=0&&gameState==='ride'){air=1;airStart=time;}}
+function doCarve(){if(gameState!=='ride')return;carve=carve===0?1:carve===1?-1:0;if(height>.28&&height<.85){score+=25;combo++;}}
+function reset(){time=0;score=0;height=.52;carve=0;air=0;wave=1;waveClock=0;combo=0;gameState='ride';bannerTimer=3.8;$('waveLabel').textContent='WAVE 1 / 3';$('banner').style.opacity='1';$('banner').querySelector('h1').textContent='SHOOT THE CURL!';}
+$('up').addEventListener('click',()=>changeHeight(.075));$('down').addEventListener('click',()=>changeHeight(-.075));$('carve').addEventListener('click',doCarve);$('air').addEventListener('click',trickAir);$('restart').addEventListener('click',reset);
+addEventListener('keydown',e=>{keys[e.key]=true;if(['ArrowUp','ArrowDown',' '].includes(e.key))e.preventDefault();if(e.repeat)return;if(e.key===' '||e.key==='x')trickAir();if(e.key==='ArrowLeft'||e.key==='a')doCarve();if(e.key==='ArrowRight'||e.key==='d')doCarve()});
 addEventListener('keyup',e=>keys[e.key]=false);
-let startY=null;canvas.addEventListener('touchstart',e=>{startY=e.touches[0].clientY},{passive:true});canvas.addEventListener('touchmove',e=>{if(startY!==null){const dy=e.touches[0].clientY-startY;if(Math.abs(dy)>14){changeHeight(dy<0?.025:-.025);startY=e.touches[0].clientY}}},{passive:true});
-setTimeout(()=>{document.getElementById('banner').style.opacity='0'},4200);
-tick();
+c.addEventListener('touchstart',e=>{touchY=e.touches[0].clientY},{passive:true});c.addEventListener('touchmove',e=>{if(touchY!==null){const dy=e.touches[0].clientY-touchY;if(Math.abs(dy)>12){changeHeight(dy<0?.025:-.025);touchY=e.touches[0].clientY}}},{passive:true});c.addEventListener('touchend',()=>touchY=null,{passive:true});
+function frame(now){
+ const dt=Math.min(.04,(now-last)/1000||.016);last=now;time+=dt;waveClock+=dt;bannerTimer=Math.max(0,bannerTimer-dt);if(bannerTimer===0)$('banner').style.opacity='0';
+ if(keys.ArrowUp||keys.w)changeHeight(dt*.3);if(keys.ArrowDown||keys.s)changeHeight(-dt*.3);
+ if(gameState==='ride'){
+   // The wave carries the rider; line choice controls scoring and risk.
+   if(height>.36&&height<.76)score+=Math.round(dt*7);
+   if(air>0){air=Math.max(0,1-(time-airStart)/.9);if(air===0){if(height>.32&&height<.86){score+=150;combo++;}else{gameState='wipeout';setTimeout(()=>{gameState='ride';height=.5;},850)}}}
+   if(height<.13||height>.91){gameState='wipeout';air=0;setTimeout(()=>{gameState='ride';height=.5;},850)}
+   if(waveClock>12){waveClock=0;wave=wave%3+1;$('waveLabel').textContent='WAVE '+wave+' / 3';score+=100;height=.52;}
+ }
+ draw();$('score').textContent=String(score).padStart(5,'0').slice(-5);$('status').textContent=gameState==='wipeout'?'WIPEOUT · RECOVER':height>.42&&height<.74?'IN THE BARREL · '+Math.round(58+height*10)+' KM/H':'TRIM · '+Math.round(58+height*10)+' KM/H';
+ requestAnimationFrame(frame);
+}
+frame(0);
 })();
 </script>
 </body>
